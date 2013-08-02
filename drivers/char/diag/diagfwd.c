@@ -693,15 +693,14 @@ void diag_smd_send_req(struct diag_smd_info *smd_info)
 
 	if (!buf && (smd_info->type == SMD_DCI_TYPE ||
 					smd_info->type == SMD_DCI_CMD_TYPE))
-		diag_dci_try_deactivate_wakeup_source(smd_info->ch);
+		diag_dci_try_deactivate_wakeup_source();
 
 	if (smd_info->ch && buf) {
-		pkt_len = smd_cur_packet_size(smd_info->ch);
 
+		pkt_len = smd_cur_packet_size(smd_info->ch);
 		if (pkt_len == 0 && (smd_info->type == SMD_DCI_TYPE ||
 					smd_info->type == SMD_DCI_CMD_TYPE))
-			diag_dci_try_deactivate_wakeup_source(smd_info->ch);
-
+			diag_dci_try_deactivate_wakeup_source();
 		if (pkt_len > buf_size)
 			resize_success = diag_smd_resize_buf(smd_info, &buf,
 							&buf_size, pkt_len);
@@ -809,7 +808,7 @@ void diag_smd_send_req(struct diag_smd_info *smd_info)
 fail_return:
 	if (smd_info->type == SMD_DCI_TYPE ||
 					smd_info->type == SMD_DCI_CMD_TYPE)
-		diag_dci_try_deactivate_wakeup_source(smd_info->ch);
+		diag_dci_try_deactivate_wakeup_source();
 	return;
 }
 
@@ -2164,7 +2163,7 @@ void diag_smd_notify(void *ctxt, unsigned event)
 	if (smd_info->type == SMD_DCI_TYPE ||
 					smd_info->type == SMD_DCI_CMD_TYPE) {
 		if (event == SMD_EVENT_DATA)
-			diag_dci_try_activate_wakeup_source(smd_info->ch);
+			diag_dci_try_activate_wakeup_source();
 		queue_work(driver->diag_dci_wq,
 				&(smd_info->diag_read_smd_work));
 	} else if (smd_info->type == SMD_DATA_TYPE) {
