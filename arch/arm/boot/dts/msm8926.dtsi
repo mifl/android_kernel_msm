@@ -206,6 +206,8 @@
 	qcom,cpr-down-threshold = <2>;
 	qcom,cpr-apc-volt-step = <10000>;
 	qcom,cpr-quotient-adjustment = <0 72 72>;
+	vdd-apc-optional-prim-supply = <&ncp6335d>;
+	vdd-apc-optional-sec-supply = <&fan53555>;
 };
 
 &tsens {
