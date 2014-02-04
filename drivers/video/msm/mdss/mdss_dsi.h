@@ -322,10 +322,7 @@ struct mdss_dsi_ctrl_pdata {
 	int octa_vci_reg_en_gpio;
 	int octa_vddi_reg_en_gpio;
 #endif
-	int rst_gpio_requested;
-	int disp_en_gpio_requested;
 	int disp_te_gpio_requested;
-	int mode_gpio_requested;
 	int bklt_ctrl;	/* backlight ctrl */
 	int pwm_period;
 	int pwm_pmic_gpio;
