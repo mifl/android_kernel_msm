@@ -1508,7 +1508,7 @@ static int diagchar_write(struct file *file, const char __user *buf,
 	}
 	if (pkt_type == CALLBACK_DATA_TYPE) {
 		if (payload_size > driver->itemsize) {
-			pr_err("diag: Dropping packet, packet payload size crosses 4KB limit. Current payload size %d\n",
+			pr_err("diag: Dropping packet, invalid packet size. Current payload size %d\n",
 				payload_size);
 			driver->dropped_count++;
 			return -EBADMSG;
