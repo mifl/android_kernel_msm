@@ -1180,7 +1180,8 @@ switch_parallel_ovp_mode(struct qpnp_chg_chip *chip, bool enable)
 		return rc;
 	}
 
-	rc = override_dcin_ilimit(chip, 0);
+	if (enable)
+		rc = override_dcin_ilimit(chip, 0);
 	return rc;
 }
 
