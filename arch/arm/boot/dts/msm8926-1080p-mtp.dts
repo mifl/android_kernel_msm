@@ -22,6 +22,10 @@
 	qcom,board-id = <8 2>;
 };
 
+&sdhc_2 {
+       qcom,pad-drv-on = <0x7 0x4 0x4>; /* 16mA, 10mA, 10mA */
+};
+
 &smsc_hub {
 	status = "ok";
 	smsc,model-id = <3502>;
