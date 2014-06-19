@@ -184,14 +184,18 @@ static int msm_compr_set_volume(struct snd_compr_stream *cstream,
 				__func__, rc);
 				return rc;
 			}
-			/* set master gain to unity so that only lr gain
-			is effective */
+			/*
+			 * set master gain to unity so that only lr gain
+			 * is effective
+			 */
 			rc = q6asm_set_volume(prtd->audio_client,
 						COMPRESSED_LR_VOL_MAX_STEPS);
 		} else {
 			pr_debug("%s: call q6asm_set_volume\n", __func__);
-			/* set left and right channel gain to unity so that
-			only master gain is effective */
+			/*
+			 * set left and right channel gain to unity so that
+			 * only master gain is effective
+			 */
 			rc = q6asm_set_lrgain(prtd->audio_client,
 						COMPRESSED_LR_VOL_MAX_STEPS,
 						COMPRESSED_LR_VOL_MAX_STEPS);
@@ -601,14 +605,24 @@ static int msm_compr_configure_dsp(struct snd_compr_stream *cstream)
 				prtd->session_id,
 				SNDRV_PCM_STREAM_PLAYBACK);
 
-	ret = q6asm_set_softpause(ac, &softpause);
+	/*
+	 * Setting the master volume gain to 0 while
+	 * configuring ASM session. This is to address
+	 * DSP pop noise issue where. This change is
+	 * there from begining may be DSP limitation
+	 */
+	ret = msm_compr_set_volume(cstream, 0, 0);
 	if (ret < 0)
-		pr_err("%s: Send SoftPause Param failed ret=%d\n",
-			__func__, ret);
+		pr_err("%s : Set Volume failed : %d", __func__, ret);
 
 	ret = q6asm_set_softvolume(ac, &softvol);
 	if (ret < 0)
 		pr_err("%s: Send SoftVolume Param failed ret=%d\n",
+			__func__, ret);
+
+	ret = q6asm_set_softpause(ac, &softpause);
+	if (ret < 0)
+		pr_err("%s: Send SoftPause Param failed ret=%d\n",
 			__func__, ret);
 
 	ret = q6asm_set_io_mode(ac, (COMPRESSED_STREAM_IO | ASYNC_IO_MODE));
