@@ -66,7 +66,7 @@
 #ifdef DEBUG_ROAM_DELAY
 #include "vos_utils.h"
 #endif
-
+#include  "sapInternal.h"
 /*--------------------------------------------------------------------------- 
   Preprocessor definitions and constants
   -------------------------------------------------------------------------*/ 
@@ -89,6 +89,7 @@ const v_U8_t hdd_QdiscAcToTlAC[] = {
 #define HDD_TX_TIMEOUT_RATELIMIT_INTERVAL 20*HZ
 #define HDD_TX_TIMEOUT_RATELIMIT_BURST    1
 #define HDD_TX_STALL_SSR_THRESHOLD        5
+#define HDD_TX_STALL_RECOVERY_THRESHOLD HDD_TX_STALL_SSR_THRESHOLD - 2
 
 static DEFINE_RATELIMIT_STATE(hdd_tx_timeout_rs,                 \
                               HDD_TX_TIMEOUT_RATELIMIT_INTERVAL, \
@@ -431,7 +432,12 @@ void hdd_mon_tx_mgmt_pkt(hdd_adapter_t* pAdapter)
        if( (hdr->frame_control & HDD_FRAME_SUBTYPE_MASK)
                                        == HDD_FRAME_SUBTYPE_DEAUTH )
        {
-          hdd_softap_sta_deauth( pAdapter, hdr->addr1 ); 
+          struct tagCsrDelStaParams delStaParams;
+
+          WLANSAP_PopulateDelStaParams(hdr->addr1, eCsrForcedDeauthSta,
+                                 (SIR_MAC_MGMT_DEAUTH >> 4), &delStaParams);
+
+          hdd_softap_sta_deauth(pAdapter, &delStaParams);
           goto mgmt_handled;
        }
        else if( (hdr->frame_control & HDD_FRAME_SUBTYPE_MASK) 
@@ -1078,6 +1084,14 @@ void __hdd_tx_timeout(struct net_device *dev)
    //update last jiffies after the check
    pAdapter->hdd_stats.hddTxRxStats.jiffiesLastTxTimeOut = jiffies;
 
+   if (pAdapter->hdd_stats.hddTxRxStats.continuousTxTimeoutCount ==
+          HDD_TX_STALL_RECOVERY_THRESHOLD)
+   {
+      VOS_TRACE(VOS_MODULE_ID_HDD_SAP_DATA, VOS_TRACE_LEVEL_ERROR,
+                "%s: Request firmware for recovery",__func__);
+      WLANTL_TLDebugMessage(WLANTL_DEBUG_FW_CLEANUP);
+   }
+
    if (pAdapter->hdd_stats.hddTxRxStats.continuousTxTimeoutCount >
        HDD_TX_STALL_SSR_THRESHOLD)
    {
@@ -1098,7 +1112,7 @@ void __hdd_tx_timeout(struct net_device *dev)
    if (__ratelimit(&hdd_tx_timeout_rs))
    {
       hdd_wmm_tx_snapshot(pAdapter);
-      WLANTL_TLDebugMessage(VOS_TRUE);
+      WLANTL_TLDebugMessage(WLANTL_DEBUG_TX_SNAPSHOT);
    }
 
 }
@@ -1624,12 +1638,12 @@ VOS_STATUS hdd_tx_fetch_packet_cbk( v_VOID_t *vosContext,
                                           pHddCtx->cfg_ini->gEnableDebugLog);
       if (VOS_PKT_PROTO_TYPE_EAPOL & proto_type)
       {
-         VOS_TRACE(VOS_MODULE_ID_HDD_DATA, VOS_TRACE_LEVEL_ERROR,
+         VOS_TRACE(VOS_MODULE_ID_HDD_DATA, VOS_TRACE_LEVEL_INFO,
                    "STA TX EAPOL");
       }
       else if (VOS_PKT_PROTO_TYPE_DHCP & proto_type)
       {
-         VOS_TRACE(VOS_MODULE_ID_HDD_DATA, VOS_TRACE_LEVEL_ERROR,
+         VOS_TRACE(VOS_MODULE_ID_HDD_DATA, VOS_TRACE_LEVEL_INFO,
                    "STA TX DHCP");
       }
    }
@@ -1654,9 +1668,17 @@ VOS_STATUS hdd_tx_fetch_packet_cbk( v_VOID_t *vosContext,
    {
       /* 1. Check if ACM is set for this AC 
        * 2. If set, check if this AC had already admitted 
-       * 3. If not already admitted, downgrade the UP to next best UP */
+       * 3. If not already admitted, downgrade the UP to next best UP
+       * 4. Allow only when medium time is non zero when Addts accepted else downgrade traffic.
+            we opted downgrading over Delts when medium time is zero because while doing downgradig
+            driver is not clearing the wmm context so consider in subsequent roaming if AP (new or
+            same AP) accept the Addts with valid medium time no application support is required
+            where if we have opted delts Applications have to again do Addts or STA will never
+            go for Addts.*/
+
       if(!pAdapter->hddWmmStatus.wmmAcStatus[ac].wmmAcAccessRequired ||
-         pAdapter->hddWmmStatus.wmmAcStatus[ac].wmmAcTspecValid)
+         (pAdapter->hddWmmStatus.wmmAcStatus[ac].wmmAcTspecValid &&
+          pAdapter->hddWmmStatus.wmmAcStatus[ac].wmmAcTspecInfo.medium_time))
       {
         pPktMetaInfo->ucUP = pktNode->userPriority;
         pPktMetaInfo->ucTID = pPktMetaInfo->ucUP;
@@ -1974,12 +1996,12 @@ VOS_STATUS hdd_rx_packet_cbk( v_VOID_t *vosContext,
                                              pHddCtx->cfg_ini->gEnableDebugLog);
          if (VOS_PKT_PROTO_TYPE_EAPOL & proto_type)
          {
-            VOS_TRACE(VOS_MODULE_ID_HDD_DATA, VOS_TRACE_LEVEL_ERROR,
+            VOS_TRACE(VOS_MODULE_ID_HDD_DATA, VOS_TRACE_LEVEL_INFO,
                       "STA RX EAPOL");
          }
          else if (VOS_PKT_PROTO_TYPE_DHCP & proto_type)
          {
-            VOS_TRACE(VOS_MODULE_ID_HDD_DATA, VOS_TRACE_LEVEL_ERROR,
+            VOS_TRACE(VOS_MODULE_ID_HDD_DATA, VOS_TRACE_LEVEL_INFO,
                       "STA RX DHCP");
          }
       }
@@ -2093,11 +2115,18 @@ void hdd_tx_rx_pkt_cnt_stat_timer_handler( void *phddctx)
             else if ((WLAN_HDD_SOFTAP == pAdapter->device_mode) ||
                      (WLAN_HDD_P2P_GO == pAdapter->device_mode))
             {
+                v_CONTEXT_t pVosContext = ( WLAN_HDD_GET_CTX(pAdapter))->pvosContext;
+                ptSapContext pSapCtx = VOS_GET_SAP_CB(pVosContext);
+                if(pSapCtx == NULL){
+                    VOS_TRACE(VOS_MODULE_ID_HDD_DATA, VOS_TRACE_LEVEL_ERROR,
+                             FL("psapCtx is NULL"));
+                    return;
+                }
                 for (staId = 0; staId < WLAN_MAX_STA_COUNT; staId++)
                 {
-                    if ((pAdapter->aStaInfo[staId].isUsed) &&
+                    if ((pSapCtx->aStaInfo[staId].isUsed) &&
                         (WLANTL_STA_AUTHENTICATED ==
-                                          pAdapter->aStaInfo[staId].tlSTAState))
+                                          pSapCtx->aStaInfo[staId].tlSTAState))
                     {
                         fconnected = TRUE;
                     }
