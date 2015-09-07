@@ -62,26 +62,26 @@ static int oem_pm_read_proc_reset_info(char *page, char **start, off_t off, int 
 	len += sprintf(page + len, "Battery Id Adc: %d\n", smem_id_vendor1_ptr->battery_id_adc);
 	len += sprintf(page + len, "HW Revision Adc: %d\n", smem_id_vendor1_ptr->hw_rev_adc);
 	len += sprintf(page + len, "Power On Mode : %d\n", smem_id_vendor1_ptr->power_on_mode);
-	len += sprintf(page + len, "SilentBoot: %d\n", (smem_id_vendor1_ptr->silent_boot_mode ? 1 : 0 ) );
+	len += sprintf(page + len, "SilentBoot: %d\n", (smem_id_vendor1_ptr->silent_boot_mode ? 1 : 0));
 	len += sprintf(page + len, "HW Revision: %d\n", smem_id_vendor1_ptr->hw_rev);
 	len += sprintf(page + len, "Battery Id: %d\n", smem_id_vendor1_ptr->battery_id);
-	len += sprintf(page + len, "Backlight Off: %d\n", (smem_id_vendor1_ptr->backlight_off ? 1 : 0 ) );
+	len += sprintf(page + len, "Backlight Off: %d\n", (smem_id_vendor1_ptr->backlight_off ? 1 : 0));
 	len += sprintf(page + len, "Reset: %d\n", oem_prev_reset);
 #if defined(CONFIG_MACH_MSM8974_EF65S)
-	len += sprintf(page + len, "SKT Charging Mode: %d\n", (smem_id_vendor1_ptr->skt_charging_mode ? 1 : 0 ) );
+	len += sprintf(page + len, "SKT Charging Mode: %d\n", (smem_id_vendor1_ptr->skt_charging_mode ? 1 : 0));
 #endif
 	
 	printk(KERN_INFO "Factory Cable Adc : 0x%x\n", smem_id_vendor1_ptr->factory_cable_adc);
 	printk(KERN_INFO "Battery Id Adc: %d\n", smem_id_vendor1_ptr->battery_id_adc);
 	printk(KERN_INFO "HW Revision Adc: %d\n", smem_id_vendor1_ptr->hw_rev_adc);
 	printk(KERN_INFO "Power On Mode : %d\n", smem_id_vendor1_ptr->power_on_mode);
-	printk(KERN_INFO "SilentBoot: %d\n", (smem_id_vendor1_ptr->silent_boot_mode ? 1 : 0 ) );
+	printk(KERN_INFO "SilentBoot: %d\n", (smem_id_vendor1_ptr->silent_boot_mode ? 1 : 0));
 	printk(KERN_INFO "HW Revision: %d\n", smem_id_vendor1_ptr->hw_rev);
 	printk(KERN_INFO "Battery Id: %d\n", smem_id_vendor1_ptr->battery_id);
-	printk(KERN_INFO "Backlight Off: %d\n", (smem_id_vendor1_ptr->backlight_off ? 1 : 0 ) );
+	printk(KERN_INFO "Backlight Off: %d\n", (smem_id_vendor1_ptr->backlight_off ? 1 : 0));
 	printk(KERN_INFO "Reset: %d\n", oem_prev_reset);
 #if defined(CONFIG_MACH_MSM8974_EF65S)
-	printk(KERN_INFO "SKT Charging Mode: %d\n", (smem_id_vendor1_ptr->skt_charging_mode ? 1 : 0 ) );
+	printk(KERN_INFO "SKT Charging Mode: %d\n", (smem_id_vendor1_ptr->skt_charging_mode ? 1 : 0));
 #endif
 	return len;
 }
@@ -95,7 +95,7 @@ int oem_pm_write_proc_reset_info(struct file *file, const char *buffer, unsigned
 	int len;
 	char tbuffer[2];
 
-	if (count > 1 )
+	if (count > 1)
 		len = 1;
 
 	memset(tbuffer, 0x00, 2);
