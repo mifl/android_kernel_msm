@@ -1996,6 +1996,13 @@ static int msm_spi_transfer_one_message(struct spi_master *master,
 
 	mutex_lock(&dd->core_lock);
 
+#ifdef CONFIG_PANTECH
+	spin_lock_irqsave(&dd->queue_lock, flags);
+	dd->transfer_pending = 1;
+	dd->cur_msg = msg;
+	spin_unlock_irqrestore(&dd->queue_lock, flags);
+#endif /* CONFIG_PANTECH */
+
 	/*
 	 * Counter-part of system-suspend when runtime-pm is not enabled.
 	 * This way, resume can be left empty and device will be put in
@@ -2007,19 +2014,23 @@ static int msm_spi_transfer_one_message(struct spi_master *master,
 	if (dd->use_rlock)
 		remote_mutex_lock(&dd->r_lock);
 
+#ifndef CONFIG_PANTECH
 	spin_lock_irqsave(&dd->queue_lock, flags);
 	dd->transfer_pending = 1;
 	spin_unlock_irqrestore(&dd->queue_lock, flags);
+#endif /* CONFIG_PANTECH */
 
 	if (dd->suspended || !msm_spi_is_valid_state(dd)) {
 		dev_err(dd->dev, "%s: SPI operational state not valid\n",
 			__func__);
 		status_error = 1;
 	}
+#ifndef CONFIG_PANTECH
 	spin_lock_irqsave(&dd->queue_lock, flags);
 	dd->transfer_pending = 1;
 	dd->cur_msg = msg;
 	spin_unlock_irqrestore(&dd->queue_lock, flags);
+#endif /* CONFIG_PANTECH */
 
 	if (status_error)
 			dd->cur_msg->status = -EIO;
