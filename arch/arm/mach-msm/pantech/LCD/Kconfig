@@ -31,102 +31,10 @@ config MACH_MSM8974_LCD_COMMON
 	select F_QUALCOMM_MOVIE_PLAYER_MDP_UNDERRUN
 	select F_QUALCOMM_WORKAROUND_FOR_GDSC_OXILI_FAIL
 	select F_SKYDISP_FIX_PINGPONG_TIMEOUT_BY_CLOCK
+
 ###################################################
 # * Defined LCD board feature                     #
 ###################################################
-if MACH_MSM8974_EF56S
-config DEFINE_LIST_EF56S
-	bool
-	default y
-	select F_SKYDISP_EF56_SS
-	select F_SKYDISP_CABC_CONTROL
-	select F_SKYDISP_SHARPNESS_CTRL
-	select F_SKYDISP_BACKLIGHT_CMDS_CTL
-
-endif
-
-if MACH_MSM8974_EF59S
-config DEFINE_LIST_EF59S
-	bool
-	default y
-	select F_SKYDISP_EF59_SS
-	select F_SKYDISP_CABC_CONTROL
-	select F_SKYDISP_SHARPNESS_CTRL
-	select F_SKYDISP_BACKLIGHT_CMDS_CTL
-endif
-
-if MACH_MSM8974_EF59K
-config DEFINE_LIST_EF59K
-	bool
-	default y
-	select F_SKYDISP_EF59_SS
-	select F_SKYDISP_CABC_CONTROL
-	select F_SKYDISP_SHARPNESS_CTRL
-	select F_SKYDISP_BACKLIGHT_CMDS_CTL
-endif
-
-if MACH_MSM8974_EF59L
-config DEFINE_LIST_EF59L
-	bool
-	default y
-	select F_SKYDISP_EF59_SS
-	select F_SKYDISP_CABC_CONTROL
-	select F_SKYDISP_SHARPNESS_CTRL
-	select F_SKYDISP_BACKLIGHT_CMDS_CTL
-endif
-
-if MACH_MSM8974_EF60S
-config DEFINE_LIST_EF60S
-	bool
-	default y
-	select F_SKYDISP_EF60_SS
-	select F_SKYDISP_CABC_CONTROL
-	select F_SKYDISP_SHARPNESS_CTRL
-	select F_SKYDISP_BACKLIGHT_CMDS_CTL
-endif
-
-if MACH_MSM8974_EF65S
-config DEFINE_LIST_EF65S
-	bool
-	default y
-	select F_SKYDISP_EF60_SS
-	select F_SKYDISP_CABC_CONTROL
-	select F_SKYDISP_SHARPNESS_CTRL
-	select F_SKYDISP_BACKLIGHT_CMDS_CTL
-endif
-
-if MACH_MSM8974_EF61K
-config DEFINE_LIST_EF61K
-	bool
-	default y
-	select F_SKYDISP_EF60_SS
-	select F_SKYDISP_CABC_CONTROL
-	select F_SKYDISP_SHARPNESS_CTRL
-	select F_SKYDISP_BACKLIGHT_CMDS_CTL
-endif
-
-if MACH_MSM8974_EF62L
-config DEFINE_LIST_EF62L
-	bool
-	default y
-	select F_SKYDISP_EF60_SS
-	select F_SKYDISP_CABC_CONTROL
-	select F_SKYDISP_SHARPNESS_CTRL
-	select F_SKYDISP_BACKLIGHT_CMDS_CTL
-endif
-
-if MACH_MSM8974_EF63S
-config DEFINE_LIST_EF63S
-	bool
-	default y
-	select F_SKYDISP_EF63_SS
-	select F_SKYDISP_HBM_FOR_AMOLED
-	select F_SKYDISP_ELVSS_WORK
-	select F_SKYDISP_SMARTDIMMING
-	select F_SKYDISP_EF63_DRIVER_IC_CHECK
-	select F_SKYDISP_AMOLED_READ_DATA
-	select F_QUALCOMM_BWC_VIDEO_DISPLAY_HALT
-endif
 
 if MACH_MSM8974_EF63K
 config DEFINE_LIST_EF63K
@@ -154,6 +62,18 @@ config DEFINE_LIST_EF63L
 	select F_QUALCOMM_BWC_VIDEO_DISPLAY_HALT
 endif
 
+if MACH_MSM8974_EF63S
+config DEFINE_LIST_EF63S
+	bool
+	default y
+	select F_SKYDISP_EF63_SS
+	select F_SKYDISP_HBM_FOR_AMOLED
+	select F_SKYDISP_ELVSS_WORK
+	select F_SKYDISP_SMARTDIMMING
+	select F_SKYDISP_EF63_DRIVER_IC_CHECK
+	select F_SKYDISP_AMOLED_READ_DATA
+	select F_QUALCOMM_BWC_VIDEO_DISPLAY_HALT
+endif
 
 ##############################################################
 ##############################################################
@@ -161,36 +81,6 @@ endif
 #                                                            #
 ##############################################################
 ##############################################################
-
-##############################################################
-# owner  : p10443
-# date    : 2013.11.26
-# PLM    :
-# Case  :
-# Description : EF56 model LCD common
-##############################################################
-config F_SKYDISP_EF56_SS
-	bool
-
-##############################################################
-# owner  : p10443
-# date    : 2013.11.26
-# PLM    :
-# Case  :
-# Description : EF59 Series model LCD common
-##############################################################
-config F_SKYDISP_EF59_SS
-	bool
-
-##############################################################
-# owner  : p10443
-# date    : 2013.11.26
-# PLM    :
-# Case  :
-# Description : EF60/61/62 Series model LCD common
-##############################################################
-config F_SKYDISP_EF60_SS
-	bool
 
 ##############################################################
 # owner  : p10443
@@ -261,7 +151,6 @@ config F_SKYDISP_CMDS_CONTROL
 ##############################################################
 config F_SKYDISP_BACKLIGHT_CMDS_CTL
 	bool
-
 
 ##############################################################
 # owner  : p13832

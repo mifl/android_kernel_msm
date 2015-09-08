@@ -3,41 +3,6 @@ config CUST_PANTECH_H
 
 menu "Pantech Board Selection"
 
-config MACH_MSM8974_EF60S
-	depends on ARCH_MSM8974
-	bool "MSM8974 EF60S"
-	select CUST_PANTECH_H
-	help
-	  Support for the Pantech MSM8974 Ef60s device.
-
-config MACH_MSM8974_EF65S
-	depends on ARCH_MSM8974
-	bool "MSM8974 EF65S"
-	select CUST_PANTECH_H
-	help
-	  Support for the Pantech MSM8974 Ef65s device.
-
-config MACH_MSM8974_EF61K
-	depends on ARCH_MSM8974
-	bool "MSM8974 EF61K"
-	select CUST_PANTECH_H
-	help
-	  Support for the Pantech MSM8974 Ef61k device.
-
-config MACH_MSM8974_EF62L
-	depends on ARCH_MSM8974
-	bool "MSM8974 EF62L"
-	select CUST_PANTECH_H
-	help
-	  Support for the Pantech MSM8974 Ef62l device.
-
-config MACH_MSM8974_EF63S
-	depends on ARCH_MSM8974
-	bool "MSM8974 EF63S"
-	select CUST_PANTECH_H
-	help
-	  Support for the Pantech MSM8974 Ef63s device.
-
 config MACH_MSM8974_EF63K
 	depends on ARCH_MSM8974
 	bool "MSM8974 EF63K"
@@ -52,163 +17,18 @@ config MACH_MSM8974_EF63L
 	help
 	  Support for the Pantech MSM8974 Ef63l device.
 
-config MACH_MSM8974_EF56S
+config MACH_MSM8974_EF63S
 	depends on ARCH_MSM8974
-	bool "MSM8974 EF56S"
+	bool "MSM8974 EF63S"
 	select CUST_PANTECH_H
 	help
-	  Support for the Pantech MSM8974 EF56S device.
-
-config MACH_MSM8974_EF59S
-	depends on ARCH_MSM8974
-	bool "MSM8974 EF59S"
-	select CUST_PANTECH_H
-	help
-	  Support for the Pantech MSM8974 EF59S device.
-
-config MACH_MSM8974_EF59K
-	depends on ARCH_MSM8974
-	bool "MSM8974 EF59K"
-	select CUST_PANTECH_H
-	help
-	  Support for the Pantech MSM8974 EF59K device.
-
-config MACH_MSM8974_EF59L
-	depends on ARCH_MSM8974
-	bool "MSM8974 EF59L"
-	select CUST_PANTECH_H
-	help
-	  Support for the Pantech MSM8974 EF59L device.
+	  Support for the Pantech MSM8974 Ef63s device.
 
 endmenu
 
 if CUST_PANTECH_H
 
 comment "PANTECH Cust feature section"
-
-if MACH_MSM8974_EF56S
-config DEFINE_LIST_EF56S
-	bool
-	default y
-	select PANTECH
-	select PANTECH_DOMESTIC
-	select PANTECH_ERR_CRASH_LOGGING
-	select PANTECH_FS_AUTO_REPAIR
-	select NLS_UTF8
-	select PANTECH_SND
-	select PANTECH_SND_QCOM_PATCH
-	select PANTECH_SND_BOOTUP_HEADSET_INFO
-	select PANTECH_SND_NXP
-	select PANTECH_SND_FLAC
-endif
-
-if MACH_MSM8974_EF59S
-config DEFINE_LIST_EF59S
-	bool
-	default y
-	select PANTECH
-	select PANTECH_DOMESTIC
-	select PANTECH_ERR_CRASH_LOGGING
-	select PANTECH_FS_AUTO_REPAIR
-	select NLS_UTF8
-	select PANTECH_SND
-	select PANTECH_SND_QCOM_PATCH
-	select PANTECH_SND_BOOTUP_HEADSET_INFO
-	select PANTECH_SND_NXP
-	select PANTECH_SND_FLAC
-endif
-
-if MACH_MSM8974_EF59K
-config DEFINE_LIST_EF59K
-	bool
-	default y
-	select PANTECH
-	select PANTECH_DOMESTIC
-	select PANTECH_ERR_CRASH_LOGGING
-	select PANTECH_FS_AUTO_REPAIR
-	select NLS_UTF8
-	select PANTECH_SND
-	select PANTECH_SND_QCOM_PATCH
-	select PANTECH_SND_NXP
-	select PANTECH_SND_FLAC
-endif
-
-if MACH_MSM8974_EF59L
-config DEFINE_LIST_EF59L
-	bool
-	default y
-	select PANTECH
-	select PANTECH_DOMESTIC
-	select PANTECH_ERR_CRASH_LOGGING
-	select PANTECH_FS_AUTO_REPAIR
-	select NLS_UTF8
-	select PANTECH_SND
-	select PANTECH_SND_QCOM_PATCH
-	select PANTECH_SND_NXP
-	select PANTECH_SND_FLAC
-endif
-
-if MACH_MSM8974_EF60S
-config DEFINE_LIST_EF60S
-	bool
-	default y
-	select PANTECH
-	select PANTECH_DOMESTIC
-	select PANTECH_ERR_CRASH_LOGGING
-	select PANTECH_FS_AUTO_REPAIR
-	select NLS_UTF8
-	select PANTECH_SND
-	select PANTECH_SND_QCOM_PATCH
-	select PANTECH_SND_BOOTUP_HEADSET_INFO
-	select PANTECH_SND_NXP
-	select PANTECH_SND_FLAC
-endif
-
-if MACH_MSM8974_EF61K
-config DEFINE_LIST_EF61K
-	bool
-	default y
-	select PANTECH
-	select PANTECH_DOMESTIC
-	select PANTECH_ERR_CRASH_LOGGING
-	select PANTECH_FS_AUTO_REPAIR
-	select NLS_UTF8
-	select PANTECH_SND
-	select PANTECH_SND_QCOM_PATCH
-	select PANTECH_SND_NXP
-	select PANTECH_SND_FLAC
-endif
-
-if MACH_MSM8974_EF62L
-config DEFINE_LIST_EF62L
-	bool
-	default y
-	select PANTECH
-	select PANTECH_DOMESTIC
-	select PANTECH_ERR_CRASH_LOGGING
-	select PANTECH_FS_AUTO_REPAIR
-	select NLS_UTF8
-	select PANTECH_SND
-	select PANTECH_SND_QCOM_PATCH
-	select PANTECH_SND_QSOUND
-	select PANTECH_SND_FLAC
-endif
-
-if MACH_MSM8974_EF63S
-config DEFINE_LIST_EF63S
-	bool
-	default y
-	select PANTECH
-	select PANTECH_DOMESTIC
-	select PANTECH_ERR_CRASH_LOGGING
-	select PANTECH_FS_AUTO_REPAIR
-	select NLS_UTF8
-	select PANTECH_SND
-	select PANTECH_SND_QCOM_PATCH
-	select PANTECH_SND_BOOTUP_HEADSET_INFO
-	select PANTECH_SND_NXP
-	select PANTECH_SND_FLAC
-endif
 
 if MACH_MSM8974_EF63K
 config DEFINE_LIST_EF63K
@@ -240,8 +60,8 @@ config DEFINE_LIST_EF63L
 	select PANTECH_SND_FLAC
 endif
 
-if MACH_MSM8974_EF65S
-config DEFINE_LIST_EF65S
+if MACH_MSM8974_EF63S
+config DEFINE_LIST_EF63S
 	bool
 	default y
 	select PANTECH
@@ -440,14 +260,14 @@ config PANTECH_PDL_DLOAD
 	  We use the "FEATURE_PANTECH_PDL_DLOAD" feature in System area. There is in "vendor/pantech/build/cust_pantech.h" .
 
 # P14994 @ 140108
-if MACH_MSM8974_EF63S || MACH_MSM8974_EF63K || MACH_MSM8974_EF63L
+if MACH_MSM8974_EF63K || MACH_MSM8974_EF63L || MACH_MSM8974_EF63S
 config PANTECH_MEM_LEAK_TRACE
 	bool
 	default n
 endif
 
 #P11536-SHPARK-SELinux
-if MACH_MSM8974_EF63S || MACH_MSM8974_EF63K || MACH_MSM8974_EF63L || MACH_MSM8974_EF65S || MACH_MSM8974_EF65K || MACH_MSM8974_EF65L
+if MACH_MSM8974_EF63K || MACH_MSM8974_EF63L || MACH_MSM8974_EF63S
 config PANTECH_SELINUX_DENIAL_LOG
 	bool
 	default y
