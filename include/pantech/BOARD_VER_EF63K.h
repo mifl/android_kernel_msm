@@ -1,0 +1,9 @@
+#ifndef BOARD_VER_EF63K_H
+#define BOARD_VER_EF63K_H
+
+#define PROJECT_NAME		"ef63k"
+#define PANTECH_BUILD_VER	"S0844130"
+#define PANTECH_BOARD_VER	tp20
+#define MSM8974_V30
+
+#endif /*BOARD_VER_EF63K_H*/
