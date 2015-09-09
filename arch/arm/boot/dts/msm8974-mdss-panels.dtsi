@@ -19,8 +19,4 @@
 /include/ "dsi-panel-jdi-dualmipi1-video.dtsi"
 /include/ "dsi-panel-jdi-dualmipi0-cmd.dtsi"
 /include/ "dsi-panel-jdi-dualmipi1-cmd.dtsi"
-/include/ "dsi-panel-ams529-1080p-cmd-ef63.dtsi"
-/include/ "dsi-panel-ams529-1080p-cmd-ef63-ws10.dtsi"
-/include/ "dsi-panel-ams529-1080p-cmd-ef63-ws20.dtsi"
-/include/ "dsi-panel-ams529-1080p-cmd-ef63-tp10.dtsi"
 /include/ "dsi-panel-ams529-1080p-cmd-ef63-tp20.dtsi"

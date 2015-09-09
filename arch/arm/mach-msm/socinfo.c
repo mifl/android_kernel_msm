@@ -59,32 +59,9 @@ enum {
 	HW_PLATFORM_HRD	= 13,
 	HW_PLATFORM_DTV	= 14,
 #if defined(CONFIG_PANTECH)
-	HW_PLATFORM_P_EF63S_PT10 = 6311, /* Pantech ef63s pt10 b'd */
-	HW_PLATFORM_P_EF63S_PT20 = 6312, /* Pantech ef63s pt20 b'd */
-	HW_PLATFORM_P_EF63S_WS10 = 6313, /* Pantech ef63s ws10 b'd */
-	HW_PLATFORM_P_EF63S_WS15 = 63135, /* Pantech ef63s ws15 b'd */
-	HW_PLATFORM_P_EF63S_WS20 = 6314, /* Pantech ef63s ws20 b'd */
-	HW_PLATFORM_P_EF63S_TP10 = 6315, /* Pantech ef63s tp10 b'd */
-	HW_PLATFORM_P_EF63S_TP20 = 6316, /* Pantech ef63s tp10 b'd */
-	HW_PLATFORM_P_EF63S_PP10 = 6317, /* Pantech ef63s pp10 b'd */
-
-	HW_PLATFORM_P_EF63K_PT10 = 6321, /* Pantech ef63k pt10 b'd */
-	HW_PLATFORM_P_EF63K_PT20 = 6322, /* Pantech ef63k pt20 b'd */
-	HW_PLATFORM_P_EF63K_WS10 = 6323, /* Pantech ef63k ws10 b'd */
-	HW_PLATFORM_P_EF63K_WS15 = 63235, /* Pantech ef63k ws15 b'd */
-	HW_PLATFORM_P_EF63K_WS20 = 6324, /* Pantech ef63k ws20 b'd */
-	HW_PLATFORM_P_EF63K_TP10 = 6325, /* Pantech ef63k tp10 b'd */
+	HW_PLATFORM_P_EF63S_TP20 = 6316, /* Pantech ef63s tp20 b'd */
 	HW_PLATFORM_P_EF63K_TP20 = 6326, /* Pantech ef63k tp20 b'd */
-	HW_PLATFORM_P_EF63K_PP10 = 6327, /* Pantech ef63k pp10 b'd */
-
-	HW_PLATFORM_P_EF63L_PT10 = 6331, /* Pantech ef63l pt10 b'd */
-	HW_PLATFORM_P_EF63L_PT20 = 6332, /* Pantech ef63l pt20 b'd */
-	HW_PLATFORM_P_EF63L_WS10 = 6333, /* Pantech ef63l ws10 b'd */
-	HW_PLATFORM_P_EF63L_WS15 = 63335, /* Pantech ef63l ws15 b'd */
-	HW_PLATFORM_P_EF63L_WS20 = 6334, /* Pantech ef63l ws20 b'd */
-	HW_PLATFORM_P_EF63L_TP10 = 6335, /* Pantech ef63l tp10 b'd */
 	HW_PLATFORM_P_EF63L_TP20 = 6336, /* Pantech ef63l tp20 b'd */
-	HW_PLATFORM_P_EF63L_PP10 = 6337, /* Pantech ef63l pp10 b'd */
 #endif
 	HW_PLATFORM_INVALID
 };
@@ -103,30 +80,9 @@ const char *hw_platform[] = {
 	[HW_PLATFORM_HRD] = "HRD",
 	[HW_PLATFORM_DTV] = "DTV",
 #if defined(CONFIG_PANTECH)
-	[HW_PLATFORM_P_EF63S_PT10] = "Pantech_EF63S_PT10",
-	[HW_PLATFORM_P_EF63S_PT20] = "Pantech_EF63S_PT20",
-	[HW_PLATFORM_P_EF63S_WS10] = "Pantech_EF63S_WS10",
-	[HW_PLATFORM_P_EF63S_WS15] = "Pantech_EF63S_WS15",
-	[HW_PLATFORM_P_EF63S_WS20] = "Pantech_EF63S_WS20",
-	[HW_PLATFORM_P_EF63S_TP10] = "Pantech_EF63S_TP10",
 	[HW_PLATFORM_P_EF63S_TP20] = "Pantech_EF63S_TP20",
-	[HW_PLATFORM_P_EF63S_PP10] = "Pantech_EF63S_PP10",
-	[HW_PLATFORM_P_EF63K_PT10] = "Pantech_EF63K_PT10",
-	[HW_PLATFORM_P_EF63K_PT20] = "Pantech_EF63K_PT20",
-	[HW_PLATFORM_P_EF63K_WS10] = "Pantech_EF63K_WS10",
-	[HW_PLATFORM_P_EF63K_WS15] = "Pantech_EF63K_WS15",
-	[HW_PLATFORM_P_EF63K_WS20] = "Pantech_EF63K_WS20",
-	[HW_PLATFORM_P_EF63K_TP10] = "Pantech_EF63K_TP10",
 	[HW_PLATFORM_P_EF63K_TP20] = "Pantech_EF63K_TP20",
-	[HW_PLATFORM_P_EF63K_PP10] = "Pantech_EF63K_PP10",
-	[HW_PLATFORM_P_EF63L_PT10] = "Pantech_EF63L_PT10",
-	[HW_PLATFORM_P_EF63L_PT20] = "Pantech_EF63L_PT20",
-	[HW_PLATFORM_P_EF63L_WS10] = "Pantech_EF63L_WS10",
-	[HW_PLATFORM_P_EF63L_WS15] = "Pantech_EF63L_WS15",
-	[HW_PLATFORM_P_EF63L_WS20] = "Pantech_EF63L_WS20",
-	[HW_PLATFORM_P_EF63L_TP10] = "Pantech_EF63L_TP10",
 	[HW_PLATFORM_P_EF63L_TP20] = "Pantech_EF63L_TP20",
-	[HW_PLATFORM_P_EF63L_PP10] = "Pantech_EF63L_PP10",
 #endif
 };
 
