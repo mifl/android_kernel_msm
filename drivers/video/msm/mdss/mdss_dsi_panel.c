@@ -356,60 +356,7 @@ static void mdss_dsi_panel_bklt_dcs(struct mdss_dsi_ctrl_pdata *ctrl, int level)
 
 void mdss_dsi_panel_reset(struct mdss_panel_data *pdata, int enable)
 {
-#if defined(CONFIG_F_SKYDISP_EF63_SS) && (CONFIG_BOARD_VER <= CONFIG_PT20)
-	struct mdss_dsi_ctrl_pdata *ctrl_pdata = NULL;
-	struct mdss_panel_info *pinfo = NULL;
-
-	if (pdata == NULL) {
-		pr_err("%s: Invalid input data\n", __func__);
-		return;
-	}
-
-	ctrl_pdata = container_of(pdata, struct mdss_dsi_ctrl_pdata,
-				panel_data);
-
-	if (!gpio_is_valid(ctrl_pdata->bl_en_gpio)) {
-		pr_debug("%s:%d, reset line not configured\n",
-			   __func__, __LINE__);
-	}
-
-	if (!gpio_is_valid(ctrl_pdata->rst_gpio)) {
-		pr_debug("%s:%d, reset line not configured\n",
-			   __func__, __LINE__);
-		return;
-	}
-	if (!gpio_is_valid(ctrl_pdata->lcd_vcip_reg_en_gpio)) {
-		pr_debug("%s:%d, lcd vcip line not configured\n",
-			   __func__, __LINE__);
-		return;
-	}
-	pr_debug("%s: enable = %d\n", __func__, enable);
-	pinfo = &(ctrl_pdata->panel_data.panel_info);
-
-	if (enable) {
-		if (gpio_is_valid(ctrl_pdata->lcd_vcip_reg_en_gpio))
-			gpio_set_value((ctrl_pdata->lcd_vcip_reg_en_gpio), 1);
-		msleep(5);
-		//gpio_set_value((ctrl_pdata->rst_gpio),1);
-		//msleep(10);
-		//gpio_set_value((ctrl_pdata->rst_gpio),0);
-		msleep(20);
-		gpio_set_value((ctrl_pdata->rst_gpio),1);
-		msleep(10);
-		if (ctrl_pdata->ctrl_state & CTRL_STATE_PANEL_INIT) {
-			pr_debug("%s: Panel Not properly turned OFF\n",
-						__func__);
-			ctrl_pdata->ctrl_state &= ~CTRL_STATE_PANEL_INIT;
-			pr_debug("%s: Reset panel done\n", __func__);
-		}
-	} else {
-		gpio_set_value((ctrl_pdata->rst_gpio), 0);
-		msleep(5);
-		if (gpio_is_valid(ctrl_pdata->lcd_vcip_reg_en_gpio))
-			gpio_set_value((ctrl_pdata->lcd_vcip_reg_en_gpio), 0);
-		msleep(100);
-	}
-#elif (defined(CONFIG_F_SKYDISP_EF63_SS) && (CONFIG_BOARD_VER >= CONFIG_WS10))
+#if defined(CONFIG_F_SKYDISP_EF63_SS)
 	struct mdss_dsi_ctrl_pdata *ctrl_pdata = NULL;
 	struct mdss_panel_info *pinfo = NULL;
 
@@ -1203,7 +1150,7 @@ static int mdss_dsi_panel_on(struct mdss_panel_data *pdata)
 	mipi  = &pdata->panel_info.mipi;
 
 	pr_debug("%s: ctrl=%p ndx=%d\n", __func__, ctrl, ctrl->ndx);
-#if defined(CONFIG_F_SKYDISP_EF63_SS) && (CONFIG_BOARD_VER >= CONFIG_WS10)
+#if defined(CONFIG_F_SKYDISP_EF63_SS)
 	gpio_set_value((ctrl->octa_rst_gpio), 1);
 	msleep(10);
 	gpio_set_value((ctrl->octa_rst_gpio), 0);

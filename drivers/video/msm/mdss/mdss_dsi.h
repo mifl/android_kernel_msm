@@ -233,12 +233,12 @@ enum {
 
 #define DSI_FLAG_CLOCK_MASTER		0x80000000
 
-#if defined(CONFIG_F_SKYDISP_EF63_SS) && (CONFIG_BOARD_VER >= CONFIG_TP10)
+#if defined(CONFIG_F_SKYDISP_EF63_SS)
 /*20140304, kkcho, [EF63] Driver-IC changed from TP20. So, processing to be able to use overlapping for WS20/TP10*/
 #define F_SKYDISP_MAGNAIC_OPERATING_BEFORE_TP20
 #endif
 
-#if defined(CONFIG_F_SKYDISP_EF63_SS) && (CONFIG_BOARD_VER >= CONFIG_TP10)
+#if defined(CONFIG_F_SKYDISP_EF63_SS)
 #define F_LSI_VDDM_OFFSET_RD_WR
 #endif
 
