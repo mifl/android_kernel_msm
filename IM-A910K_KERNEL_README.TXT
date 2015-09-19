@@ -1,6 +1,6 @@
 How to Build:
 
-    1. Get Toolchain (arm-eabi-4.6) and install
+    1. Get Toolchain (arm-eabi-4.8) and install
        (Visit android git server or codesourcery)
 
     2. wlan download:
@@ -8,7 +8,7 @@ How to Build:
 
     3. Build the Kernel:
         1) Modify below lines in "build_ef63k.sh"
-            export PATH=$(pwd)/../../../prebuilts/gcc/linux-x86/arm/arm-eabi-4.6/bin:$PATH
+            export PATH=$(pwd)/../../../prebuilts/gcc/linux-x86/arm/arm-eabi-4.8/bin:$PATH
         2) Run Kernel Build Script
             $ ./build_ef63k.sh
 
@@ -19,6 +19,6 @@ How to Build:
 
     5. Clean Kernel:
         1) Modify below lines in "clean_kernel.sh"
-            export PATH=$(pwd)/../../../prebuilts/gcc/linux-x86/arm/arm-eabi-4.6/bin:$PATH
+            export PATH=$(pwd)/../../../prebuilts/gcc/linux-x86/arm/arm-eabi-4.8/bin:$PATH
         2) Run Kernel Clean Script
             $ ./clean_kernel.sh
