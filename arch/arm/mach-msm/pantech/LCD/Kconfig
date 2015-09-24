@@ -88,16 +88,6 @@ config F_SKYDISP_EF63_SS
 	bool
 
 ##############################################################
-# owner  : p13832   seunghwa_ji
-# date    : 2013.04.11
-# PLM    :
-# Case  :
-# Description : it is for cabc control
-##############################################################
-config F_SKYDISP_CABC_CONTROL
-	bool
-
-##############################################################
 # owner  : p13832 seunghwa_ji
 # date    : 2013.04.30
 # PLM    :

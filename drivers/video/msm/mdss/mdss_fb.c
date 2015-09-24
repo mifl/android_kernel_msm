@@ -401,56 +401,6 @@ static ssize_t msm_fb_acl_store(struct device *dev, struct device_attribute *att
 static DEVICE_ATTR(acl_ctl, S_IRUGO | S_IWUSR, NULL, msm_fb_acl_store);
 #endif /* CONFIG_F_SKYDISP_HBM_FOR_AMOLED */
 
-#ifdef CONFIG_F_SKYDISP_CABC_CONTROL
-extern void cabc_control(struct mdss_panel_data *pdata, int state);
-char cabc_state_ret[5];
-static bool prev_cabc=0;
-static ssize_t msm_fb_cabc_store(struct device *dev, struct device_attribute *attr, 
-			const char *buf,size_t count)
-{
-	bool cabc = 0;
-	struct fb_info *fbi = dev_get_drvdata(dev);
-	struct msm_fb_data_type *mfd = (struct msm_fb_data_type *)fbi->par;
-	struct mdss_panel_info *pdata = mfd->panel_info;
-	struct mdss_panel_data * ctrl_pdata =NULL;
-	strcpy(cabc_state_ret,buf);
-	if (strncmp(cabc_state_ret,"on",2) == 0)
-		cabc = true;
-	else if (strncmp(cabc_state_ret,"off",3) == 0)
-		cabc = false;
-	else
-		printk("msm_fb_cabc_store err\n");
-
-	if (!(mfd) || !(mfd->op_enable) || (cabc && prev_cabc)) {
-		printk(KERN_ERR "msm_fb_cabc_store+, do not store cabc. op_enable=%d, cabc=%d, prev_cabc=%d\n", mfd->op_enable, cabc, prev_cabc);
-		return count;
-	}
-
-	ctrl_pdata = container_of(pdata, struct mdss_panel_data,
-				panel_info);
-
-	if (cabc)
-		cabc_control(ctrl_pdata,1);
-	else
-		cabc_control(ctrl_pdata,0);
-
-
-	prev_cabc = cabc;
-	printk("msm_fb_cabc_store : %s\n",buf);
-	return count;
-}
-
-static ssize_t msm_fb_cabc_show(struct device *dev,
-					  struct device_attribute *attr, char *buf)
-{
-	printk("msm_fb_cabc_show : %s \n",cabc_state_ret);
-
-	return sprintf(buf, "%s\n", cabc_state_ret);
-}
-
-static DEVICE_ATTR(cabc_ctl, S_IRUGO | S_IWUSR, msm_fb_cabc_show, msm_fb_cabc_store);
-#endif /* CONFIG_F_SKYDISP_CABC_CONTROL */
-
 #ifdef CONFIG_F_SKYDISP_SHARPNESS_CTRL
 extern unsigned int sharpness_count;
 extern void sharpness_control(struct msm_fb_data_type *pdata, int state);
@@ -781,9 +731,6 @@ static struct attribute *mdss_fb_attrs[] = {
 	&dev_attr_show_blank_event.attr,
 	&dev_attr_idle_time.attr,
 	&dev_attr_idle_notify.attr,
-#ifdef CONFIG_F_SKYDISP_CABC_CONTROL
-	&dev_attr_cabc_ctl.attr,
-#endif
 #ifdef CONFIG_F_SKYDISP_SHARPNESS_CTRL
 	&dev_attr_sharpness_ctl.attr,
 #endif

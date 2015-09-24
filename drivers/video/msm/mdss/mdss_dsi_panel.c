@@ -604,38 +604,6 @@ static int mdss_dsi_panel_partial_update(struct mdss_panel_data *pdata)
 	return rc;
 }
 
-#ifdef CONFIG_F_SKYDISP_CABC_CONTROL
-void cabc_control(struct mdss_panel_data *pdata, int state)
-{
-	struct mdss_dsi_ctrl_pdata *ctrl_pdata = NULL;
-	ctrl_pdata = container_of(pdata, struct mdss_dsi_ctrl_pdata,panel_data);
-#if defined(CONFIG_F_SKYDISP_EF56_SS) || defined(CONFIG_F_SKYDISP_EF60_SS)
-	if (state == 1) {
-		*(ctrl_pdata->cabc_cmds.cmds->payload + 1) = 0x01;
-		ctrl_pdata->on_cmds.buf[207] = 0x01;
-	} else if (state == 0) {
-		*(ctrl_pdata->cabc_cmds.cmds->payload + 1) = 0x00;
-		ctrl_pdata->on_cmds.buf[207] = 0x00;
-	} else { //for err
-		*(ctrl_pdata->cabc_cmds.cmds->payload+ 1) = 0x01;
-		ctrl_pdata->on_cmds.buf[207] = 0x01;
-	}
-#else
-	if (state == 1) {
-		*(ctrl_pdata->cabc_cmds.cmds->payload + 1) = 0x03;
-		ctrl_pdata->on_cmds.buf[178] = 0x03;
-	} else if (state == 0) {
-		*(ctrl_pdata->cabc_cmds.cmds->payload + 1) = 0x00;
-		ctrl_pdata->on_cmds.buf[178] = 0x00;
-	} else { //for err
-		*(ctrl_pdata->cabc_cmds.cmds->payload+ 1) = 0x03;
-		ctrl_pdata->on_cmds.buf[178] = 0x03;
-	}
-#endif
-	mdss_dsi_panel_cmds_send(ctrl_pdata, &ctrl_pdata->cabc_cmds);
-}
-#endif /* CONFIG_F_SKYDISP_CABC_CONTROL */
-
 #ifdef CONFIG_F_SKYDISP_AMOLED_READ_DATA
 void mtp_read_genernal(int data,char * read_buf)
 {
@@ -1952,11 +1920,6 @@ static int mdss_panel_parse_dt(struct device_node *np,
 
 	mdss_dsi_parse_dcs_cmds(np, &ctrl_pdata->off_cmds,
 		"qcom,mdss-dsi-off-command", "qcom,mdss-dsi-off-command-state");
-
-#ifdef CONFIG_F_SKYDISP_CABC_CONTROL
-	mdss_dsi_parse_dcs_cmds(np, &ctrl_pdata->cabc_cmds,
-		"qcom,mdss-dsi-cabc-command", "qcom,mdss-dsi-cabc-command-state");
-#endif
 
 #ifdef F_LSI_VDDM_OFFSET_RD_WR
 	mdss_dsi_parse_dcs_cmds(np, &ctrl_pdata->display_on_cmds,

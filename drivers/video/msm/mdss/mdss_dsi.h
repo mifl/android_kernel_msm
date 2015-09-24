@@ -350,9 +350,6 @@ struct mdss_dsi_ctrl_pdata {
 	struct dsi_panel_cmds magnaic_on_cmds;
 #endif
 	struct dsi_panel_cmds off_cmds;
-#ifdef CONFIG_F_SKYDISP_CABC_CONTROL
-	struct dsi_panel_cmds cabc_cmds;
-#endif
 #ifdef CONFIG_F_SKYDISP_CMDS_CONTROL
 	int lcd_cmds_check;
 	struct dsi_panel_cmds on_cmds_user;
