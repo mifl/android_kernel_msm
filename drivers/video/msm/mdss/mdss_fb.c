@@ -1154,7 +1154,7 @@ void mdss_fb_set_backlight(struct msm_fb_data_type *mfd, u32 bkl_lvl)
 	if (((!mfd->panel_power_on && mfd->dcm_state != DCM_ENTER)
 		|| !mfd->bl_updated) && !IS_CALIB_MODE_BL(mfd)) {
 		mfd->unset_bl_level = bkl_lvl;
-#if defined(CONFIG_MACH_MSM8974_EF63S) || defined(CONFIG_MACH_MSM8974_EF63K) || defined(CONFIG_MACH_MSM8974_EF63L)
+#if defined(CONFIG_F_SKYDISP_EF63_SS)
 		if (mfd->bl_level_old != temp) {
 			;
 		} else {
@@ -1471,13 +1471,7 @@ static int mdss_fb_register(struct msm_fb_data_type *mfd)
 	var->grayscale = 0,	/* No graylevels */
 	var->nonstd = 0,	/* standard pixel format */
 	var->activate = FB_ACTIVATE_VBL,	/* activate it at vsync */
-#if defined(CONFIG_MACH_MSM8974_EF56S) || defined(CONFIG_MACH_MSM8974_EF60S) || defined(CONFIG_MACH_MSM8974_EF65S) || defined(CONFIG_MACH_MSM8974_EF61K) || defined(CONFIG_MACH_MSM8974_EF62L)
-	var->height = 122,	/* height of picture in mm */
-	var->width = 69,	/* width of picture in mm */
-#elif defined(CONFIG_MACH_MSM8974_EF59S) || defined(CONFIG_MACH_MSM8974_EF59K) || defined(CONFIG_MACH_MSM8974_EF59L)
-	var->height = 130,	/* height of picture in mm */
-	var->width = 73,	/* width of picture in mm */
-#elif defined(CONFIG_MACH_MSM8974_EF63S) || defined(CONFIG_MACH_MSM8974_EF63K) || defined(CONFIG_MACH_MSM8974_EF63L)
+#if defined(CONFIG_F_SKYDISP_EF63_SS)
 	var->height = 117,	/* height of picture in mm */
 	var->width = 66,	/* width of picture in mm */
 #else

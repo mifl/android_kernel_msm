@@ -360,10 +360,6 @@ struct mdss_dsi_ctrl_pdata {
 	struct dsi_panel_cmds read_disable_cmds;
 	struct dsi_panel_cmds vddm_offset_write_cmds;
 #endif
-#if defined(CONFIG_MACH_MSM8974_EF56S) || defined(CONFIG_F_SKYDISP_EF60_SS) || \
-    defined(CONFIG_F_SKYDISP_EF59_SS)
-	int lcd_on_skip_during_bootup;
-#endif
 
 	struct dcs_cmd_list cmdlist;
 	struct completion dma_comp;

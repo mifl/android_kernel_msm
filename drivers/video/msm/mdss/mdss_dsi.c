@@ -55,8 +55,7 @@ static int mdss_dsi_regulator_init(struct platform_device *pdev)
 
 static int mdss_dsi_panel_power_on(struct mdss_panel_data *pdata, int enable)
 {
-#if defined(CONFIG_F_SKYDISP_EF56_SS) || defined(CONFIG_F_SKYDISP_EF59_SS) || \
-    defined(CONFIG_F_SKYDISP_EF60_SS) || (defined(CONFIG_F_SKYDISP_EF63_SS) && (CONFIG_BOARD_VER <= CONFIG_PT20))
+#if defined(CONFIG_F_SKYDISP_EF63_SS) && (CONFIG_BOARD_VER <= CONFIG_PT20)
 	int ret;
 	struct mdss_dsi_ctrl_pdata *ctrl_pdata = NULL;
 
@@ -1167,10 +1166,6 @@ static int __devinit mdss_dsi_ctrl_probe(struct platform_device *pdev)
 		} else {
 			ctrl_pdata->panel_data.silent_backlight = false;
 		}
-#if defined(CONFIG_MACH_MSM8974_EF65S) && defined(CONFIG_PANTECH_ERR_CRASH_LOGGING)
-	} else if (pantech_sys_rst_is_skt_charging_mode()) {
-		ctrl_pdata->panel_data.silent_backlight = true;
-#endif
 	} else {
 		ctrl_pdata->panel_data.silent_backlight = false;
 	}
@@ -1401,8 +1396,7 @@ int dsi_panel_device_register(struct device_node *pan_node,
 		pinfo->new_fps = pinfo->mipi.frame_rate;
 	}
 
-#if defined(CONFIG_F_SKYDISP_EF56_SS) || defined(CONFIG_F_SKYDISP_EF59_SS) || \
-    defined(CONFIG_F_SKYDISP_EF60_SS) || (defined(CONFIG_F_SKYDISP_EF63_SS) && (CONFIG_BOARD_VER <= CONFIG_PT20))
+#if defined(CONFIG_F_SKYDISP_EF63_SS) && (CONFIG_BOARD_VER <= CONFIG_PT20)
 	/* backlight gpio */
 	ctrl_pdata->bl_en_gpio = of_get_named_gpio(ctrl_pdev->dev.of_node,
 						     "qcom,platform-bl-en-gpio", 0);
@@ -1556,51 +1550,6 @@ int dsi_panel_device_register(struct device_node *pan_node,
 			return -ENODEV;
 		}
 	}
-#if defined(CONFIG_F_SKYDISP_EF56_SS)
-	/* -5.4V regulator */
-	ctrl_pdata->lcd_vcin_reg_en_gpio = of_get_named_gpio(ctrl_pdev->dev.of_node,
-						 "qcom,platform-vcin-reg-gpio", 0);
-	if (!gpio_is_valid(ctrl_pdata->lcd_vcin_reg_en_gpio)) {
-		pr_err("%s:%d, -5.4v Ext Regulator gpio not specified\n",
-						__func__, __LINE__);
-	} else {
-		rc = gpio_request(ctrl_pdata->lcd_vcin_reg_en_gpio, "lcd_vcin_ext_reg");
-		if (rc) {
-			pr_err("request -5.4v Ext Regulator gpio failed, rc=%d\n",
-				rc);
-			gpio_free(ctrl_pdata->lcd_vcin_reg_en_gpio);
-			if (gpio_is_valid(ctrl_pdata->bl_en_gpio))
-				gpio_free(ctrl_pdata->bl_en_gpio);
-			if (gpio_is_valid(ctrl_pdata->lcd_vddio_switch_en_gpio))
-				gpio_free(ctrl_pdata->lcd_vddio_switch_en_gpio);
-			if (gpio_is_valid(ctrl_pdata->lcd_vddio_reg_en_gpio))
-				gpio_free(ctrl_pdata->lcd_vddio_reg_en_gpio);
-			if (gpio_is_valid(ctrl_pdata->lcd_vcip_reg_en_gpio))
-				gpio_free(ctrl_pdata->lcd_vcip_reg_en_gpio);
-			if (gpio_is_valid(ctrl_pdata->rst_gpio))
-				gpio_free(ctrl_pdata->rst_gpio);
-
-			return -ENODEV;
-		}
-		rc = gpio_direction_output(ctrl_pdata->lcd_vcin_reg_en_gpio, 1);
-		if (rc) {
-			pr_err("set_direction for lcd_vci_ext_reg gpio failed, rc=%d\n",
-			       rc);
-			gpio_free(ctrl_pdata->lcd_vcin_reg_en_gpio);
-			if (gpio_is_valid(ctrl_pdata->bl_en_gpio))
-				gpio_free(ctrl_pdata->bl_en_gpio);
-			if (gpio_is_valid(ctrl_pdata->lcd_vddio_switch_en_gpio))
-				gpio_free(ctrl_pdata->lcd_vddio_switch_en_gpio);
-			if (gpio_is_valid(ctrl_pdata->lcd_vddio_reg_en_gpio))
-				gpio_free(ctrl_pdata->lcd_vddio_reg_en_gpio);
-			if (gpio_is_valid(ctrl_pdata->lcd_vcip_reg_en_gpio))
-				gpio_free(ctrl_pdata->lcd_vcip_reg_en_gpio);
-			if (gpio_is_valid(ctrl_pdata->rst_gpio))
-				gpio_free(ctrl_pdata->rst_gpio);
-			return -ENODEV;
-		}
-	}
-#endif /* defined(CONFIG_F_SKYDISP_EF56_SS) */
 #elif (defined(CONFIG_F_SKYDISP_EF63_SS) && (CONFIG_BOARD_VER >= CONFIG_WS10))
 
 	/* octa vddi enable */
