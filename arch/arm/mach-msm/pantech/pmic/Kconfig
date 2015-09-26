@@ -1,5 +1,7 @@
 if CUST_PANTECH_H
 
+comment "PANTECH PMIC Kernel Configuration"
+
 config MACH_MSM8974_PMIC_COMMON
 	bool
 	default y

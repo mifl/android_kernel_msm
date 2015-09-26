@@ -467,4 +467,13 @@ config PANTECH_PS_WQE_COM_PREF_LOGGING
 	bool "PANTECH PS WQE COM PREF LOGGING"
 	default n
 
+config FEATURE_SKY_CP_F3_TRACE
+	bool "Enable f3trace commands"
+	depends on (MACH_MSM8974_EF63K || MACH_MSM8974_EF63S)
+	default y
+
+config FEATURE_SKY_CP_DMLOGGING_DPL
+	bool "Enable DMLOGGING DPL"
+	default y
+
 endif

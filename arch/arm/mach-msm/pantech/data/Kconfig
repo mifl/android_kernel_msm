@@ -1,12 +1,58 @@
-#ifdef FEATURE_SKY_DS_KERNEL_CONFIG
-
 if CUST_PANTECH_H
+
+#ifdef FEATURE_SKY_DS_KERNEL_CONFIG
 
 menu "SKY Data Kernel Configuration"
 
+config MACH_MSM8974_DATA_COMMON
+	bool
+	default y
+	select SKY_DS_TETHEER_MSS
+	select SKY_DS_VPN
+	select SKY_DS_IPSEC
+	select SKY_DS_BAM_ADAPTIVE_TIMER_OFF
+	select SKY_DS_ACCEPT_SIP_LAGRE_PACKET
+	select SKY_DS_TCP_INIFINITE_LOOP_BUG_FIX
+	select SKY_DS_KERNEL_CRASH_DUT_TO_NULL_POINTER
+	select SKY_DS_ANDROID_SECURITY_PATCH_CVE_2014_2851
+	select SKY_DS_ANDROID_SECURITY_PATCH_CVE_2014_4943
+
+if MACH_MSM8974_EF63K
+config DEFINE_LIST_EF63K
+	bool
+	default y
+	select SKY_DS_DEFAULT_CONGESTION_CONTROL
+	select SKY_DS_SUPPORT_TUN
+	select SKY_DS_SUPPORT_BACKGROUND_TRFFIC_CONTROL_AGENT
+	select SKY_DS_CTS_LOCALHOST
+	select SKY_DS_CHANGE_RNDIS_MTU
+endif
+
+if MACH_MSM8974_EF63L
+config DEFINE_LIST_EF63L
+	bool
+	default y
+	select LGU_DS_TCP_SYN_RETRANSMIT
+	select SKY_DS_OPTIMIZE_IPV6_ASSIGNMENT
+	select SKY_DS_OPTIMIZE_IPV6_ASSIGNMENT_CRASH_FIX
+endif
+
+if MACH_MSM8974_EF63S
+config DEFINE_LIST_EF63S
+	bool
+	default y
+	select SKY_DS_DEFAULT_CONGESTION_CONTROL
+	select SKY_DS_SUPPORT_TUN
+	select SKY_DS_SUPPORT_BACKGROUND_TRFFIC_CONTROL_AGENT
+	select SKY_DS_CTS_LOCALHOST
+	select SKY_DS_CHANGE_RNDIS_MTU
+	select SKY_DS_OPTIMIZE_IPV6_ASSIGNMENT
+	select SKY_DS_OPTIMIZE_IPV6_ASSIGNMENT_CRASH_FIX
+endif
+
 config SKY_DS_DEFAULT_CONGESTION_CONTROL
 	bool "default congestion control setting"
-	default y
+	default n
 	select TCP_CONG_ADVANCED
 	select DEFAULT_BIC
 	select TCP_CONG_BIC
@@ -18,16 +64,23 @@ config DEFAULT_TCP_CONG
 	default "bic"
 	help
 
+config LGU_DS_TCP_SYN_RETRANSMIT
+	bool "TCP SYN RETRANSMIT"
+	default n
+	help
+	  Select if you want to change RTO and TCP_SYN_RETRIES when TCP syn transfer
+	  tcp resync nymber is 5.(first transfer, 1s, 2s, 4s, 8s)
+
 config SKY_DS_TETHEER_MSS
 	bool "enable CONFIG_NETFILTER about TCP MSS"
-	default y
+	default n
 	select NETFILTER_XT_TARGET_TCPMSS
 	select NETFILTER_XT_MATCH_TCPMSS
 	help
 
 config SKY_DS_VPN
 	bool "VPN"
-	default y
+	default n
 	select NET_KEY
 	select INET_ESP
 	select INET_IPCOMP
@@ -64,87 +117,106 @@ config SKY_DS_VPN
 
 config SKY_DS_IPSEC
 	bool "enable INET CONFIG for IP SEC"
-	default y
+	default n
 	select INET_AH
 	select INET_XFRM_TUNNEL
 	help
 
 config SKY_DS_SUPPORT_TUN
 	bool "support for tun driver"
-	default y
+	default n
 	select TUN
 	help
 
 config SKY_DS_SUPPORT_BACKGROUND_TRFFIC_CONTROL_AGENT
 	bool "support for advanced netfilter"
-	default y
+	default n
 	select NETFILTER_ADVANCED
 	help
 
 config SKY_DS_CTS_LOCALHOST
 	bool "support for traffic statistic each uid"
-	default y
+	default n
 	select UID_STAT
 	help
 
 config SKY_DS_BAM_ADAPTIVE_TIMER_OFF
 	bool "BAN ADAPTIVE TIMER DISABLE"
-	default y
+	default n
 	help
 	  DL Throughput
 
 config SKY_DS_CHANGE_RNDIS_MTU
-	bool "changed rndis mtu size to 1440"
-	default y
+	bool "changed rndis mtu size to 1440 or 1450"
+	default n
 	help
 
 config SKY_DS_ACCEPT_SIP_LAGRE_PACKET
 	bool "accept SIP packet over MTU size"
-	default y
+	default n
 	help
+	  https://www.codeaurora.org/cgit/quic/la/kernel/msm/commit/?id=9736cb3f9aa9c620965d937f4ff0261f6ac32ee1
+	  This config it must be eliminated because is used in all devices.
+	  Already applied in the kernel history.
 
 config SKY_DS_TCP_INIFINITE_LOOP_BUG_FIX
-	bool "avoid infinite loop on recvmsg by tcp"
-	default y
+	bool "tcp: Avoid infinite loop on recvmsg bug"
+	default n
 	help
+	  https://www.codeaurora.org/cgit/quic/la/kernel/msm/commit/?id=d90b9d57d2c072802aefc73752239da13fde96ad
+	  This config it must be eliminated because is used in all devices.
+	  Already applied in the kernel history.
 
 config SKY_DS_KERNEL_CRASH_DUT_TO_NULL_POINTER
-	bool "kernel crash due to null pointer dereference security patch 2013-6432"
-	default y
+	bool "ping: prevent NULL pointer dereference on write to msg_name"
+	default n
 	help
+	  https://www.codeaurora.org/cgit/quic/la/kernel/msm/commit/?id=537c27c3729a4cf4d22d556bcbc3142a31d2c834
+	  This config it must be eliminated because is used in all devices.
+	  Already applied in the kernel history.
 
 config SKY_DS_OPTIMIZE_IPV6_ASSIGNMENT
 	bool "IPv6 Address Asignment"
-	default y
+	default n
 	help
 
 config SKY_DS_OPTIMIZE_IPV6_ASSIGNMENT_CRASH_FIX
-	bool "Prevent device from crashing"
+	bool "net/ipv6/addrconf: fix wdog_bark caused by infinite spinning on a deadlock"
 	depends on SKY_DS_OPTIMIZE_IPV6_ASSIGNMENT
-	default y
+	default n
 	help
 	  Device crashed when optimizing IPv6 address assignment which means reducing assignment duration.
 	  It's crashed because 'ifa->idev' is null at 'if6_get_first' function.
+	  https://www.codeaurora.org/cgit/quic/la/kernel/msm/commit/?id=b624ab52a79d040e5f6b725baef642f5ab9615a8
+	  This config it must be eliminated because is used in all devices.
+	  Already applied in the kernel history.
 
 config SKY_DS_ANDROID_SECURITY_PATCH_CVE_2014_2851
 	bool "net: ipv4: current group_info should be put after using."
-	default y
+	default n
 	help
 	  Plug a group_info refcount leak in ping_init.
 	  group_info is only needed during initialization and
 	  the code failed to release the reference on exit.
 	  While here move grabbing the reference to a place
 	  where it is actually needed.
+	  https://www.codeaurora.org/cgit/quic/la/kernel/msm/commit/?id=314b255f44369d198f480e7c1609edac48dfebda
+	  This config it must be eliminated because is used in all devices.
+	  Already applied in the kernel history.
 
 config SKY_DS_ANDROID_SECURITY_PATCH_CVE_2014_4943
-	bool "Arbitrary kernel code execution via PPPOL2TP -ID: CVE-2014-4943"
-	default y
+	bool "net/l2tp: don't fall back on UDP [get|set]sockopt"
+	default n
 	help
-	  Since this can never have worked so nobody could possibly have depended
-	  on that functionality, just remove the broken code and return -EINVAL.
+	  The l2tp [get|set]sockopt() code has fallen back to the UDP functions
+	  for socket option levels != SOL_PPPOL2TP since day one, but that has
+	  never actually worked, since the l2tp socket isn't an inet socket.
+	  https://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git/commit/?id=3cf521f7dc87c031617fd47e4b7aa2593c2f3daf
+	  This config it must be eliminated because is used in all devices.
+	  Already applied in the kernel history.
 
 endmenu
 
-endif
-
 #endif /* FEATURE_SKY_DS_KERNEL_CONFIG */
+
+endif

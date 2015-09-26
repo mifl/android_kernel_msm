@@ -133,6 +133,7 @@ void sky_sys_rst_is_silent_boot_backlight(int backlight)
 	printk(KERN_INFO "[%s] backlight store= %d\n",__func__,backlight);
 }
 EXPORT_SYMBOL(sky_sys_rst_is_silent_boot_backlight);
+
 void sky_sys_rst_is_silent_boot_for_test(int silent_mode,int backlight)
 {
 	oem_pm_smem_vendor1_data_type *smem_vendor1_data;

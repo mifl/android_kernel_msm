@@ -1,5 +1,7 @@
 if CUST_PANTECH_H
 
+menu "SKY GPU/Display Configuration"
+
 ###################################################
 # PANTECH LCD Feature Section                     #
 #                                                 #
@@ -497,6 +499,8 @@ config F_QUALCOMM_BWC_VIDEO_DISPLAY_HALT
 ###################################################################
 config F_SKYDISP_FIX_PINGPONG_TIMEOUT_BY_CLOCK
 	bool "msm: mdss: keep clocks on during kickoff operation"
+
+endmenu
 
 endif
 

@@ -39,7 +39,7 @@
 #include <asm/uaccess.h>
 #include <linux/workqueue.h>
 
-#define SECTOR_SIZE 512
+#include <pantech/sky_rawdata.h>
 
 enum {
 	IDLE_PDL_ERROR_NONE = 0,
@@ -473,7 +473,7 @@ static void load_phoneinfo_with_imei(struct work_struct *work_s)
 
 
 	memset(read_buf, 0, SECTOR_SIZE);
-	read_result = read_offset_from_rawdata(328704, 16, read_buf);
+	read_result = read_offset_from_rawdata(NON_SECURE_IMEI_START, 16, read_buf);
 	if (read_result != IDLE_PDL_ERROR_NONE)
 		printk(KERN_ERR "%s: read fail - non_secure_imei from rawdata (read result : %d)\n", __func__, read_result);
 	else
@@ -492,8 +492,8 @@ static void load_phoneinfo_with_imei(struct work_struct *work_s)
 		const char str_non_secure[] = "3ru(3$"; // non-secure target
 
 		memset(read_buf, 0, SECTOR_SIZE);
-		printk(KERN_ERR "%s: PANTECH_SECBOOT_FLAG pos=%x\n", __func__, 333824);
-		read_result = read_offset_from_rawdata(333824, SECTOR_SIZE, read_buf);
+		printk(KERN_ERR "%s: PANTECH_SECBOOT_FLAG pos=%x\n", __func__, PANTECH_SECBOOT_FLAG_START);
+		read_result = read_offset_from_rawdata(PANTECH_SECBOOT_FLAG_START, SECTOR_SIZE, read_buf);
 		if (read_result != IDLE_PDL_ERROR_NONE) {
 			printk(KERN_ERR "%s: load_rawdata_seboot_flag failed! (%d)\n", __func__, read_result);
 			printk(KERN_ERR "%s: secure target (for safety)\n", __func__);
