@@ -18,7 +18,6 @@ config MACH_MSM8974_LCD_COMMON
 	select F_SKYDISP_SILENT_BOOT
 	select F_SKYDISP_CMDS_CONTROL
 	select F_SKYDISP_BACKLIGHT_CMDS_CTL
-	select F_QUALCOMM_OVERLAY_CORRUPTION
 	select F_SKYDISP_FACTORY_SLEEP_ENABLE
 	select F_QUALCOMM_VIDEO_PLAYER_HALT
 	select F_SKYDISP_ADJUST_MDP_BANDWIDTH
@@ -208,16 +207,6 @@ config F_SKYDISP_AMOLED_READ_DATA
 #							     #
 ##############################################################
 ##############################################################
-
-##############################################################
-# owner  : p13832
-# date    : 2014.03.26
-# PLM    :
-# Case  :  01493568
-# Description : when aot player, overlay is broken
-##############################################################
-config F_QUALCOMM_OVERLAY_CORRUPTION
-	bool "msm: mdss: Fix BWC width alignment"
 
 ##############################################################
 # owner  : p10443
