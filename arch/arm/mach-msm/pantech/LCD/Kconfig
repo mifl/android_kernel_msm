@@ -23,7 +23,6 @@ config MACH_MSM8974_LCD_COMMON
 	select F_SKYDISP_ADJUST_MDP_BANDWIDTH
 	select F_QUALCOMM_BUGFIX_SURFACEFLINGER_PENDING
 	select F_QUALCOMM_BUGFIX_MDP_UNDERRUN
-	select F_QUALCOMM_BOOTING_BLUESCREEN
 	select F_QUALCOMM_MDP_RGB_LAYER_UNDERRUN
 	select F_QUALCOMM_MOVIE_PLAYER_MDP_UNDERRUN
 	select F_QUALCOMM_WORKAROUND_FOR_GDSC_OXILI_FAIL
@@ -260,16 +259,6 @@ config F_QUALCOMM_WORKAROUND_FOR_GDSC_OXILI_FAIL
 ##############################################################
 config F_QUALCOMM_BUGFIX_MDP_UNDERRUN
 	bool
-
-##############################################################
-# owner  : p10443
-# date   : 2014.02.17
-# PLM    :
-# Case   : #01451824
-# Description : The bluescreen occurs during booting in video mode.
-##############################################################
-config F_QUALCOMM_BOOTING_BLUESCREEN
-	bool "msm: msm_bus: Only set clock rate on unset clocks."
 
 ##############################################################
 # owner  : p14974
