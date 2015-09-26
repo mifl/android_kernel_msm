@@ -13,8 +13,9 @@ How to Build:
             $ ./build_ef63k.sh
 
     4. Output Files:
-        - kernel : ./zImage
-        - module : ./obj/KERNEL_OBJ/drivers/*/*.ko
+        - kernel: ./mkbootimg/ef63k/zImage
+        - module: ./obj/KERNEL_OBJ/drivers/*/*.ko
+        - boot.img: ./mkbootimg/ef63k/boot.img
 
     5. Clean Kernel:
         1) Modify below lines in "clean_kernel.sh"
