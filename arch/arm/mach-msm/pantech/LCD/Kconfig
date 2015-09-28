@@ -24,7 +24,6 @@ config MACH_MSM8974_LCD_COMMON
 	select F_QUALCOMM_BUGFIX_SURFACEFLINGER_PENDING
 	select F_QUALCOMM_BUGFIX_MDP_UNDERRUN
 	select F_QUALCOMM_WORKAROUND_FOR_GDSC_OXILI_FAIL
-	select F_SKYDISP_FIX_PINGPONG_TIMEOUT_BY_CLOCK
 
 ###################################################
 # * Defined LCD board feature                     #
@@ -257,16 +256,6 @@ config F_QUALCOMM_BUGFIX_MDP_UNDERRUN
 ##############################################################
 config F_QUALCOMM_BWC_VIDEO_DISPLAY_HALT
 	bool "msm: mdss: Remove init phase programming"
-
-###################################################################
-# owner  : p14974
-# date    : 2014.10.16
-# PLM    : Market Issue
-# Case  : 01753421
-# Description : force mdp clock on when display kickoff is started
-###################################################################
-config F_SKYDISP_FIX_PINGPONG_TIMEOUT_BY_CLOCK
-	bool "msm: mdss: keep clocks on during kickoff operation"
 
 endmenu
 
