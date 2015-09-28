@@ -39,7 +39,6 @@ config DEFINE_LIST_EF63K
 	select F_SKYDISP_SMARTDIMMING
 	select F_SKYDISP_EF63_DRIVER_IC_CHECK
 	select F_SKYDISP_AMOLED_READ_DATA
-	select F_QUALCOMM_BWC_VIDEO_DISPLAY_HALT
 endif
 
 if MACH_MSM8974_EF63L
@@ -52,7 +51,6 @@ config DEFINE_LIST_EF63L
 	select F_SKYDISP_SMARTDIMMING
 	select F_SKYDISP_EF63_DRIVER_IC_CHECK
 	select F_SKYDISP_AMOLED_READ_DATA
-	select F_QUALCOMM_BWC_VIDEO_DISPLAY_HALT
 endif
 
 if MACH_MSM8974_EF63S
@@ -65,7 +63,6 @@ config DEFINE_LIST_EF63S
 	select F_SKYDISP_SMARTDIMMING
 	select F_SKYDISP_EF63_DRIVER_IC_CHECK
 	select F_SKYDISP_AMOLED_READ_DATA
-	select F_QUALCOMM_BWC_VIDEO_DISPLAY_HALT
 endif
 
 ##############################################################
@@ -246,16 +243,6 @@ config F_QUALCOMM_WORKAROUND_FOR_GDSC_OXILI_FAIL
 ##############################################################
 config F_QUALCOMM_BUGFIX_MDP_UNDERRUN
 	bool
-
-##############################################################
-# owner  : p10443
-# date    : 2014.07.29
-# PLM    : EF63K PLM_2282
-# Case  : 01629276
-# Description : video play <-> recent app display halt
-##############################################################
-config F_QUALCOMM_BWC_VIDEO_DISPLAY_HALT
-	bool "msm: mdss: Remove init phase programming"
 
 endmenu
 
