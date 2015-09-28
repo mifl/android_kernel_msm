@@ -23,7 +23,6 @@ config MACH_MSM8974_LCD_COMMON
 	select F_SKYDISP_ADJUST_MDP_BANDWIDTH
 	select F_QUALCOMM_BUGFIX_SURFACEFLINGER_PENDING
 	select F_QUALCOMM_BUGFIX_MDP_UNDERRUN
-	select F_QUALCOMM_MOVIE_PLAYER_MDP_UNDERRUN
 	select F_QUALCOMM_WORKAROUND_FOR_GDSC_OXILI_FAIL
 	select F_SKYDISP_FIX_PINGPONG_TIMEOUT_BY_CLOCK
 
@@ -248,17 +247,6 @@ config F_QUALCOMM_WORKAROUND_FOR_GDSC_OXILI_FAIL
 ##############################################################
 config F_QUALCOMM_BUGFIX_MDP_UNDERRUN
 	bool
-
-##############################################################
-# owner  : p14974
-# date    : 2014.04.15
-# PLM    : EF59S_KK 583
-# Case  : 01518153
-# Description : move mdp clk margin calculation on individual pipe
-#               so that enable individual pipe decimation
-##############################################################
-config F_QUALCOMM_MOVIE_PLAYER_MDP_UNDERRUN
-	bool "msm: mdss: calculate mdp clk requirement of each pipe with the fudge factor"
 
 ##############################################################
 # owner  : p10443
