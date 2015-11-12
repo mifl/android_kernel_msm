@@ -1,23 +1,30 @@
 /*
-  * Copyright (c) 2012-2013, The Linux Foundation. All rights reserved.
-  *
-  * Previously licensed under the ISC license by Qualcomm Atheros, Inc.
-  *
-  *
-  * Permission to use, copy, modify, and/or distribute this software for
-  * any purpose with or without fee is hereby granted, provided that the
-  * above copyright notice and this permission notice appear in all
-  * copies.
-  *
-  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL
-  * WARRANTIES WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED
-  * WARRANTIES OF MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE
-  * AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL
-  * DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR
-  * PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER
-  * TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
-  * PERFORMANCE OF THIS SOFTWARE.
-*/
+ * Copyright (c) 2012-2013 The Linux Foundation. All rights reserved.
+ *
+ * Previously licensed under the ISC license by Qualcomm Atheros, Inc.
+ *
+ *
+ * Permission to use, copy, modify, and/or distribute this software for
+ * any purpose with or without fee is hereby granted, provided that the
+ * above copyright notice and this permission notice appear in all
+ * copies.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL
+ * WARRANTIES WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE
+ * AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL
+ * DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR
+ * PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER
+ * TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+ * PERFORMANCE OF THIS SOFTWARE.
+ */
+
+/*
+ * This file was originally distributed by Qualcomm Atheros, Inc.
+ * under proprietary terms before Copyright ownership was assigned
+ * to the Linux Foundation.
+ */
+
 /*==========================================================================
  *
  *  @file:     wlan_hal_cfg.h
@@ -26,8 +33,6 @@
  *
  *  @author:   Kumar Anand
  *
- *             Copyright (C) 2010, Qualcomm Technologies, Inc. 
- *             All rights reserved.
  *
  *=========================================================================*/
 
@@ -264,6 +269,7 @@
 
 #define QWLAN_HAL_CFG_MAX_PARAMS                             210
 
+
 /* Total number of Integer CFGs. This is used while allocating the memory for TLV */
 #define QWLAN_HAL_CFG_INTEGER_PARAM                     210
 
@@ -429,14 +435,6 @@
 #define QWLAN_HAL_CFG_FIXED_RATE_STAMIN                        0
 #define QWLAN_HAL_CFG_FIXED_RATE_STAMAX                        226
 #define QWLAN_HAL_CFG_FIXED_RATE_STADEF                        QWLAN_HAL_CFG_FIXED_RATE_AUTO
-
-/* QWLAN_HAL_CFG_RMCAST_FIXED_RATE
- * Follwing rates in user configuration are mapped to TPE rates
- * Mapping is defined in the gHalUserFixedRateCfgToTpeRateTable
- */
-#define QWLAN_HAL_CFG_RMCAST_FIXED_RATE_STAMIN                 0
-#define QWLAN_HAL_CFG_RMCAST_FIXED_RATE_STAMAX                 226
-#define QWLAN_HAL_CFG_RMCAST_FIXED_RATE_STADEF                 QWLAN_HAL_CFG_FIXED_RATE_24MBPS
 
 /* QWLAN_HAL_CFG_RETRYRATE_POLICY */
 #define QWLAN_HAL_CFG_RETRYRATE_POLICY_STAMIN         0
@@ -924,11 +922,11 @@
 
 #define QWLAN_HAL_CFG_BTC_SAP_STATIC_OPP_WLAN_ACTIVE_WLAN_LEN_MIN 0
 #define QWLAN_HAL_CFG_BTC_SAP_STATIC_OPP_WLAN_ACTIVE_WLAN_LEN_MAX 250000
-#define QWLAN_HAL_CFG_BTC_SAP_STATIC_OPP_WLAN_ACTIVE_WLAN_LEN_DEF 60000
+#define QWLAN_HAL_CFG_BTC_SAP_STATIC_OPP_WLAN_ACTIVE_WLAN_LEN_DEF 30000
 
 #define QWLAN_HAL_CFG_BTC_SAP_STATIC_OPP_WLAN_ACTIVE_BT_LEN_MIN   0
 #define QWLAN_HAL_CFG_BTC_SAP_STATIC_OPP_WLAN_ACTIVE_BT_LEN_MAX   250000
-#define QWLAN_HAL_CFG_BTC_SAP_STATIC_OPP_WLAN_ACTIVE_BT_LEN_DEF   90000
+#define QWLAN_HAL_CFG_BTC_SAP_STATIC_OPP_WLAN_ACTIVE_BT_LEN_DEF   30000
 
 #define QWLAN_HAL_CFG_BTC_CTS2S_ON_STA_DURING_SCO_MIN     0
 #define QWLAN_HAL_CFG_BTC_CTS2S_ON_STA_DURING_SCO_MAX     1
@@ -984,7 +982,7 @@
 
 /*RSSI Hysteresis Threshold for RSSI-RTT*/
 #define QWLAN_HAL_CFG_ASD_RTT_RSSI_HYST_THRESHOLD_DEF     50
-#define QWLAN_HAL_CFG_ASD_RTT_RSSI_HYST_THRESHOLD_MIN     0
+#define QWLAN_HAL_CFG_ASD_RTT_RSSI_HYST_THRESHOLD_MIN     50
 #define QWLAN_HAL_CFG_ASD_RTT_RSSI_HYST_THRESHOLD_MAX     100
 
 /* QWLAN_HAL_CFG_LINK_FAIL_TIMEOUT */
@@ -1036,5 +1034,6 @@
 #define QWLAN_HAL_CFG_BURST_MODE_BE_TXOP_VALUE_MIN 0
 #define QWLAN_HAL_CFG_BURST_MODE_BE_TXOP_VALUE_MAX 12288
 #define QWLAN_HAL_CFG_BURST_MODE_BE_TXOP_VALUE_DEF 0
+
 
 #endif //__WLAN_HAL_CFG_H__
