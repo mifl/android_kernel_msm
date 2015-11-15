@@ -13,7 +13,7 @@
 ##############################################################################
 
 export ARCH=arm
-export PATH=$(pwd)/../../../prebuilts/gcc/linux-x86/arm/arm-eabi-4.7/bin:$PATH
+export PATH=$(pwd)/../../../prebuilts/gcc/linux-x86/arm/arm-eabi-4.6/bin:$PATH
 export CROSS_COMPILE=arm-eabi-
 
 ##############################################################################
@@ -21,7 +21,7 @@ export CROSS_COMPILE=arm-eabi-
 ##############################################################################
 
 mkdir -p ./obj/KERNEL_OBJ/
-make ARCH=arm O=./obj/KERNEL_OBJ/ msm8974-perf_defconfig
+make ARCH=arm O=./obj/KERNEL_OBJ/ msm8974_ef59k_tp20_user_defconfig
 make -j4 ARCH=arm O=./obj/KERNEL_OBJ/ 2>&1 | tee kernel_log.txt
 
 ##############################################################################
