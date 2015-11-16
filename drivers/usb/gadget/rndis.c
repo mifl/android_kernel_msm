@@ -945,6 +945,13 @@ int rndis_set_param_dev(u8 configNr, struct net_device *dev, u16 *cdc_filter)
 	if (configNr >= RNDIS_MAX_CONFIGS) return -1;
 
 	rndis_per_dev_params[configNr].dev = dev;
+#ifdef CONFIG_SKY_DS_CHANGE_RNDIS_MTU
+#if defined(CONFIG_MACH_MSM8974_EF59K)
+	rndis_per_dev_params[configNr].dev->mtu = 1450;
+#elif defined(CONFIG_MACH_MSM8974_EF59S)
+	rndis_per_dev_params[configNr].dev->mtu = 1440;
+#endif
+#endif /* CONFIG_SKY_DS_CHANGE_RNDIS_MTU */
 	rndis_per_dev_params[configNr].filter = cdc_filter;
 
 	/* reset aggregation stats for every set_alt */
