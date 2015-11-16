@@ -229,7 +229,12 @@ static void qpnpint_irq_mask_ack(struct irq_data *d)
 	int rc;
 	uint8_t prev_int_en = per_d->int_en;
 
+#ifdef CONFIG_PANTECH
+	/* debugging pmic interrupt in sleep */
+	pr_warning("hwirq %lu irq: %d\n", d->hwirq, d->irq);
+#else
 	pr_debug("hwirq %lu irq: %d\n", d->hwirq, d->irq);
+#endif /* CONFIG_PANTECH */
 
 	if (!chip_d->cb) {
 		pr_warn_ratelimited("No arbiter on bus=%u slave=%u offset=%u\n",
