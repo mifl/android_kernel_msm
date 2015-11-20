@@ -10,8 +10,9 @@ How to Build:
             $ ./build_ef59k.sh
 
     3. Output Files:
-        - kernel: ./zImage
+        - kernel: ./mkbootimg/ef59k/zImage
         - module: ./obj/KERNEL_OBJ/drivers/*/*.ko
+        - boot.img: ./mkbootimg/ef59k/boot.img
 
     4. Clean Kernel:
         1) Modify below lines in "clean_kernel.sh"
