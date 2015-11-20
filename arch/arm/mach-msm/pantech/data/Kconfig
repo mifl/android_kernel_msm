@@ -71,7 +71,7 @@ config SKY_DS_BAM_ADAPTIVE_TIMER_OFF
 
 config SKY_DS_DEFAULT_CONGESTION_CONTROL
 	bool "default congestion control setting"
-	depends on (MACH_MSM8974_EF59S)
+	depends on (PANTECH_SKT)
 	default y
 	select TCP_CONG_ADVANCED
 	select DEFAULT_BIC
@@ -86,7 +86,7 @@ config DEFAULT_TCP_CONG
 
 config LGU_DS_TCP_SYN_RETRANSMIT
 	bool "TCP SYN RETRANSMIT"
-	depends on (MACH_MSM8974_EF59L)
+	depends on (PANTECH_LGU)
 	default y
 	help
 	  Select if you want to change RTO and TCP_SYN_RETRIES when TCP syn transfer
@@ -106,20 +106,20 @@ config SKY_DS_SUPPORT_BACKGROUND_TRFFIC_CONTROL_AGENT
 
 config SKY_DS_CTS_LOCALHOST
 	bool "support for traffic statistic each uid"
-	depends on (MACH_MSM8974_EF59K || MACH_MSM8974_EF59S)
+	depends on (PANTECH_KT || PANTECH_SKT)
 	default y
 	select UID_STAT
 	help
 
 config SKY_DS_CHANGE_RNDIS_MTU
 	bool "changed rndis mtu size to 1440 or 1450"
-	depends on (MACH_MSM8974_EF59K || MACH_MSM8974_EF59S)
+	depends on (PANTECH_KT || PANTECH_SKT)
 	default y
 	help
 
 config SKY_DS_OPTIMIZE_IPV6_ASSIGNMENT
 	bool "IPv6 Address Asignment"
-	depends on (MACH_MSM8974_EF59L || MACH_MSM8974_EF59S)
+	depends on (PANTECH_LGU || PANTECH_SKT)
 	default y
 	help
 
