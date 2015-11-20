@@ -27,8 +27,18 @@
 /* 1.5 bus fudge factor */
 #define MDSS_MDP_BUS_FUDGE_FACTOR_IB(val) (((val) / 2) * 3)
 #define MDSS_MDP_BUS_FUDGE_FACTOR_HIGH_IB(val) (val << 1)
+#ifdef CONFIG_F_SKYDISP_ADJUST_MDP_BANDWIDTH
+#define MDSS_MDP_BUS_FUDGE_FACTOR_AB(val) (div_u64(val,10) * 40);  //it is okay about 3.10 but 4.0 is safe for underrun*/
+#else
 #define MDSS_MDP_BUS_FUDGE_FACTOR_AB(val) (val << 1)
+#endif
+#if defined(CONFIG_F_SKYDISP_EF56_SS) || defined(CONFIG_F_SKYDISP_EF59_SS) || \
+    defined(CONFIG_F_SKYDISP_EF60_SS)
+/* 20140325, kkcho, Bug-fix : 8974_KK underrun-issue, 1.6G ==> 3.2G */
+#define MDSS_MDP_BUS_FLOOR_BW (3200000000ULL >> MDSS_MDP_BUS_FACTOR_SHIFT)
+#else
 #define MDSS_MDP_BUS_FLOOR_BW (1600000000ULL >> MDSS_MDP_BUS_FACTOR_SHIFT)
+#endif
 
 /* 1.25 clock fudge factor */
 #define MDSS_MDP_CLK_FUDGE_FACTOR(val) (((val) * 5) / 4)
@@ -106,6 +116,30 @@ static u32 __mdss_mdp_ctrl_perf_ovrd_helper(struct mdss_mdp_mixer *mixer,
 	return ovrd;
 }
 
+#ifdef CONFIG_F_QUALCOMM_MDP_RGB_LAYER_UNDERRUN
+static void getNumFullRGBLayers(struct mdss_mdp_mixer *mixer,
+		u32 *nFullRGBPipe)
+{
+	struct mdss_panel_info *pinfo;
+	struct mdss_mdp_pipe *pipe;
+	u32 mnum = 0;
+
+	if (!mixer || !mixer->ctl->panel_data)
+		return;
+
+	pinfo = &mixer->ctl->panel_data->panel_info;
+	for (mnum = 0; mnum < MDSS_MDP_MAX_STAGE; mnum++) {
+		pipe = mixer->stage_pipe[mnum];
+		if (pipe && pinfo) {
+			if (pipe->src.w==pinfo->xres && pipe->src.h==pinfo->yres && !pipe->src_fmt->is_yuv)
+				*nFullRGBPipe = *nFullRGBPipe + 1;
+		}
+	}
+
+	return;
+}
+#endif
+
 /**
  * mdss_mdp_ctrl_perf_ovrd() - Determines if performance override is needed
  * @mdata:	Struct containing references to all MDP5 hardware structures
@@ -124,6 +158,9 @@ static void __mdss_mdp_ctrl_perf_ovrd(struct mdss_data_type *mdata,
 {
 	struct mdss_mdp_ctl *ctl;
 	u32 i, npipe = 0, ovrd = 0;
+#ifdef CONFIG_F_QUALCOMM_MDP_RGB_LAYER_UNDERRUN
+	u32 nFullRGBPipe = 0;
+#endif
 
 	for (i = 0; i < mdata->nctl; i++) {
 		ctl = mdata->ctl_off + i;
@@ -133,7 +170,21 @@ static void __mdss_mdp_ctrl_perf_ovrd(struct mdss_data_type *mdata,
 				ctl->mixer_left, &npipe);
 		ovrd |= __mdss_mdp_ctrl_perf_ovrd_helper(
 				ctl->mixer_right, &npipe);
+
+#ifdef CONFIG_F_QUALCOMM_MDP_RGB_LAYER_UNDERRUN
+		getNumFullRGBLayers(ctl->mixer_left, &nFullRGBPipe);
+		getNumFullRGBLayers(ctl->mixer_right, &nFullRGBPipe);
+#endif
 	}
+
+#ifdef CONFIG_F_QUALCOMM_MDP_RGB_LAYER_UNDERRUN
+	if (nFullRGBPipe>=4) {
+		pr_debug("*** Before adjust ib quota = %llu bytes\n", *ib_quota);
+		*ib_quota = (div_u64(*ib_quota,10) * 15); // It is OK with multiplied ib value by 1.5 and more
+		*ab_quota = *ib_quota;
+		pr_debug("*** After adjust ib quota = %llu bytes\n", *ib_quota);
+	}
+#endif
 
 	*ab_quota = MDSS_MDP_BUS_FUDGE_FACTOR_AB(*ab_quota);
 	if (npipe > 1)
@@ -1851,7 +1902,12 @@ int mdss_mdp_display_wait4comp(struct mdss_mdp_ctl *ctl)
 		ret = ctl->wait_fnc(ctl, NULL);
 
 	if (ctl->perf_changed) {
+#ifdef CONFIG_F_QUALCOMM_MOVIE_PLAYER_MDP_ROTATOR_UNDERRUN
+		if (ctl->mixer_left && !ctl->mixer_left->rotator_mode)
+			mdss_mdp_ctl_perf_commit(ctl->mdata, ctl->perf_changed);
+#else
 		mdss_mdp_ctl_perf_commit(ctl->mdata, ctl->perf_changed);
+#endif
 		ctl->perf_changed = 0;
 	}
 

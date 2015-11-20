@@ -21,8 +21,14 @@
 #include <linux/leds.h>
 #include <linux/qpnp/pwm.h>
 #include <linux/err.h>
+#include <linux/workqueue.h>
+#include <linux/msm_tsens.h>
 
+#include "mdss_fb.h"
 #include "mdss_dsi.h"
+#include "mdss_mdp.h"
+
+extern struct msm_fb_data_type * mfdmsm_fb_get_mfd(void);
 
 #define DT_CMD_HDR 6
 
@@ -129,6 +135,39 @@ static void mdss_dsi_panel_cmds_send(struct mdss_dsi_ctrl_pdata *ctrl,
 	mdss_dsi_cmdlist_put(ctrl, &cmdreq);
 }
 
+#if defined(CONFIG_F_SKYDISP_EF56_SS) || defined(CONFIG_F_SKYDISP_EF59_SS) || \
+    defined(CONFIG_F_SKYDISP_EF60_SS)
+static char led_pwm1[3] = {0x51, 0x00, 0x00};	/* DTYPE_DCS_LWRITE */
+static struct dsi_cmd_desc backlight_cmd = {
+	{DTYPE_DCS_LWRITE, 1, 0, 0, 1, sizeof(led_pwm1)},
+	led_pwm1
+};
+
+void mdss_dsi_panel_bklt_dcs(struct mdss_dsi_ctrl_pdata *ctrl, int level)
+{
+	struct dcs_cmd_req cmdreq;
+
+	pr_err("%s: level=%d\n", __func__, level);
+#if 0//defined(CONFIG_F_SKYDISP_EF56_SS)
+//PWM 22khz
+	led_pwm1[1] = (unsigned char)(level >>8) & 0x0F;
+	led_pwm1[2] = (unsigned char)level & 0xFF;
+#else
+//PWM 10khz
+	led_pwm1[2] = (unsigned char)level & 0xFF;
+#endif
+
+	memset(&cmdreq, 0, sizeof(cmdreq));
+	cmdreq.cmds = &backlight_cmd;
+	cmdreq.cmds_cnt = 1;
+	cmdreq.flags = CMD_REQ_COMMIT | CMD_CLK_CTRL;
+	cmdreq.rlen = 0;
+	cmdreq.cb = NULL;
+
+	msleep(1);
+	mdss_dsi_cmdlist_put(ctrl, &cmdreq);
+}
+#else /* QCOM Original */
 static char led_pwm1[2] = {0x51, 0x0};	/* DTYPE_DCS_WRITE1 */
 static struct dsi_cmd_desc backlight_cmd = {
 	{DTYPE_DCS_WRITE1, 1, 0, 0, 1, sizeof(led_pwm1)},
@@ -152,9 +191,75 @@ static void mdss_dsi_panel_bklt_dcs(struct mdss_dsi_ctrl_pdata *ctrl, int level)
 
 	mdss_dsi_cmdlist_put(ctrl, &cmdreq);
 }
+#endif /* QCOM Original */
 
 void mdss_dsi_panel_reset(struct mdss_panel_data *pdata, int enable)
 {
+#if defined(CONFIG_F_SKYDISP_EF56_SS) || defined(CONFIG_F_SKYDISP_EF59_SS) || \
+    defined(CONFIG_F_SKYDISP_EF60_SS)
+	struct mdss_dsi_ctrl_pdata *ctrl_pdata = NULL;
+	struct mdss_panel_info *pinfo = NULL;
+
+	if (pdata == NULL) {
+		pr_err("%s: Invalid input data\n", __func__);
+		return;
+	}
+
+	ctrl_pdata = container_of(pdata, struct mdss_dsi_ctrl_pdata,
+				panel_data);
+
+	if (!gpio_is_valid(ctrl_pdata->bl_en_gpio)) {
+		pr_debug("%s:%d, reset line not configured\n",
+			   __func__, __LINE__);
+	}
+
+	if (!gpio_is_valid(ctrl_pdata->rst_gpio)) {
+		pr_debug("%s:%d, reset line not configured\n",
+			   __func__, __LINE__);
+		return;
+	}
+	if (!gpio_is_valid(ctrl_pdata->lcd_vcip_reg_en_gpio)) {
+		pr_debug("%s:%d, lcd vcip line not configured\n",
+			   __func__, __LINE__);
+		return;
+	}
+	pr_debug("%s: enable = %d\n", __func__, enable);
+	pinfo = &(ctrl_pdata->panel_data.panel_info);
+
+	if (enable) {
+		if (gpio_is_valid(ctrl_pdata->lcd_vcip_reg_en_gpio))
+			gpio_set_value((ctrl_pdata->lcd_vcip_reg_en_gpio), 1);
+		msleep(5);
+#if defined(CONFIG_F_SKYDISP_EF56_SS)
+		if (gpio_is_valid(ctrl_pdata->lcd_vcin_reg_en_gpio))
+			gpio_set_value((ctrl_pdata->lcd_vcin_reg_en_gpio), 1);
+		msleep(3);
+#endif
+		//gpio_set_value((ctrl_pdata->rst_gpio),1);
+		//msleep(10);
+		//gpio_set_value((ctrl_pdata->rst_gpio),0);
+		msleep(20);
+		gpio_set_value((ctrl_pdata->rst_gpio),1);
+		msleep(10);
+		if (ctrl_pdata->ctrl_state & CTRL_STATE_PANEL_INIT) {
+			pr_debug("%s: Panel Not properly turned OFF\n",
+						__func__);
+			ctrl_pdata->ctrl_state &= ~CTRL_STATE_PANEL_INIT;
+			pr_debug("%s: Reset panel done\n", __func__);
+		}
+	} else {
+		gpio_set_value((ctrl_pdata->rst_gpio), 0);
+		msleep(5);
+#if defined(CONFIG_F_SKYDISP_EF56_SS)
+		if (gpio_is_valid(ctrl_pdata->lcd_vcin_reg_en_gpio))
+			gpio_set_value((ctrl_pdata->lcd_vcin_reg_en_gpio), 0);
+		msleep(3);
+#endif
+		if (gpio_is_valid(ctrl_pdata->lcd_vcip_reg_en_gpio))
+			gpio_set_value((ctrl_pdata->lcd_vcip_reg_en_gpio), 0);
+		msleep(100);
+	}
+#else /* QCOM Original */
 	struct mdss_dsi_ctrl_pdata *ctrl_pdata = NULL;
 	struct mdss_panel_info *pinfo = NULL;
 	int i;
@@ -209,6 +314,7 @@ void mdss_dsi_panel_reset(struct mdss_panel_data *pdata, int enable)
 		if (gpio_is_valid(ctrl_pdata->disp_en_gpio))
 			gpio_set_value((ctrl_pdata->disp_en_gpio), 0);
 	}
+#endif /* QCOM Original */
 }
 
 static char caset[] = {0x2a, 0x00, 0x00, 0x03, 0x00};	/* DTYPE_DCS_LWRITE */
@@ -266,18 +372,75 @@ static int mdss_dsi_panel_partial_update(struct mdss_panel_data *pdata)
 	return rc;
 }
 
+#ifdef CONFIG_F_SKYDISP_CABC_CONTROL
+void cabc_control(struct mdss_panel_data *pdata, int state)
+{
+	struct mdss_dsi_ctrl_pdata *ctrl_pdata = NULL;
+	ctrl_pdata = container_of(pdata, struct mdss_dsi_ctrl_pdata,panel_data);
+#if defined(CONFIG_F_SKYDISP_EF56_SS) || defined(CONFIG_F_SKYDISP_EF60_SS)
+	if (state == 1) {
+		*(ctrl_pdata->cabc_cmds.cmds->payload + 1) = 0x01;
+		ctrl_pdata->on_cmds.buf[207] = 0x01;
+	} else if (state == 0) {
+		*(ctrl_pdata->cabc_cmds.cmds->payload + 1) = 0x00;
+		ctrl_pdata->on_cmds.buf[207] = 0x00;
+	} else { //for err
+		*(ctrl_pdata->cabc_cmds.cmds->payload+ 1) = 0x01;
+		ctrl_pdata->on_cmds.buf[207] = 0x01;
+	}
+#else
+	if (state == 1) {
+		*(ctrl_pdata->cabc_cmds.cmds->payload + 1) = 0x03;
+		ctrl_pdata->on_cmds.buf[178] = 0x03;
+	} else if (state == 0) {
+		*(ctrl_pdata->cabc_cmds.cmds->payload + 1) = 0x00;
+		ctrl_pdata->on_cmds.buf[178] = 0x00;
+	} else { //for err
+		*(ctrl_pdata->cabc_cmds.cmds->payload+ 1) = 0x03;
+		ctrl_pdata->on_cmds.buf[178] = 0x03;
+	}
+#endif
+	mdss_dsi_panel_cmds_send(ctrl_pdata, &ctrl_pdata->cabc_cmds);
+}
+#endif /* CONFIG_F_SKYDISP_CABC_CONTROL */
+
+#if defined(CONFIG_F_SKYDISP_EF56_SS) || defined(CONFIG_F_SKYDISP_EF59_SS) || \
+    defined(CONFIG_F_SKYDISP_EF60_SS)
+bool first_enable = false;
+#endif
+
 static void mdss_dsi_panel_bl_ctrl(struct mdss_panel_data *pdata,
 							u32 bl_level)
 {
 	struct mdss_dsi_ctrl_pdata *ctrl_pdata = NULL;
+	struct msm_fb_data_type * mfd = mfdmsm_fb_get_mfd();
 
 	if (pdata == NULL) {
 		pr_err("%s: Invalid input data\n", __func__);
 		return;
 	}
 
+	if (!mfd->panel_power_on) {
+		printk("[%s] panel is off state (%d).....\n",__func__,mfd->panel_power_on);
+		return;
+	}
+
 	ctrl_pdata = container_of(pdata, struct mdss_dsi_ctrl_pdata,
 				panel_data);
+#if defined(CONFIG_F_SKYDISP_EF56_SS) || defined(CONFIG_F_SKYDISP_EF59_SS) || \
+    defined(CONFIG_F_SKYDISP_EF60_SS)
+	if (bl_level == 0) {
+		gpio_set_value((ctrl_pdata->bl_en_gpio), 0);
+		first_enable = false;
+		printk("%s:bl_en_gpio off\n",__func__);
+	} else {
+		if (first_enable ==false) {
+			gpio_set_value((ctrl_pdata->bl_en_gpio), 1);
+			first_enable = true;
+			printk("%s:bl_en_gpio on\n",__func__);
+		}
+	}
+#endif
 
 	/*
 	 * Some backlight controllers specify a minimum duty cycle
@@ -296,7 +459,17 @@ static void mdss_dsi_panel_bl_ctrl(struct mdss_panel_data *pdata,
 		mdss_dsi_panel_bklt_pwm(ctrl_pdata, bl_level);
 		break;
 	case BL_DCS_CMD:
+#if defined(CONFIG_F_SKYDISP_EF56_SS) || defined(CONFIG_F_SKYDISP_EF59_SS) || \
+    defined(CONFIG_F_SKYDISP_EF60_SS)
+		mdss_set_tx_power_mode(0 , pdata);
+		msleep(2);
+#endif
 		mdss_dsi_panel_bklt_dcs(ctrl_pdata, bl_level);
+#if defined(CONFIG_F_SKYDISP_EF56_SS) || defined(CONFIG_F_SKYDISP_EF59_SS) || \
+    defined(CONFIG_F_SKYDISP_EF60_SS)
+		msleep(1);
+		mdss_set_tx_power_mode(1 , pdata);
+#endif
 		break;
 	default:
 		pr_err("%s: Unknown bl_ctrl configuration\n",
@@ -321,10 +494,31 @@ static int mdss_dsi_panel_on(struct mdss_panel_data *pdata)
 
 	pr_debug("%s: ctrl=%p ndx=%d\n", __func__, ctrl, ctrl->ndx);
 
+#ifdef CONFIG_F_SKYDISP_CMDS_CONTROL
+	if (ctrl->lcd_cmds_check == false) {
+		if (ctrl->on_cmds.cmd_cnt) {
+#if defined(CONFIG_MACH_MSM8974_EF56S) || defined(CONFIG_F_SKYDISP_EF60_SS)
+			if (ctrl->lcd_on_skip_during_bootup)
+				ctrl->on_cmds.buf[189] = 0x00;
+#elif defined(CONFIG_F_SKYDISP_EF59_SS)
+			if (ctrl->lcd_on_skip_during_bootup)
+				ctrl->on_cmds.buf[160] = 0x00;
+#endif
+			mdss_dsi_panel_cmds_send(ctrl, &ctrl->on_cmds);
+		}
+	} else if (ctrl->lcd_cmds_check == true) {
+		if (ctrl->on_cmds_user.cmd_cnt)
+			mdss_dsi_panel_cmds_send(ctrl, &ctrl->on_cmds_user);
+		pr_info("user LCD on cmds---------------->\n");
+	}
+
+	pr_err("%s:-\n", __func__);
+#else
 	if (ctrl->on_cmds.cmd_cnt)
 		mdss_dsi_panel_cmds_send(ctrl, &ctrl->on_cmds);
 
 	pr_debug("%s:-\n", __func__);
+#endif
 	return 0;
 }
 
@@ -348,7 +542,15 @@ static int mdss_dsi_panel_off(struct mdss_panel_data *pdata)
 	if (ctrl->off_cmds.cmd_cnt)
 		mdss_dsi_panel_cmds_send(ctrl, &ctrl->off_cmds);
 
+#if defined(CONFIG_MACH_MSM8974_EF56S) || defined(CONFIG_F_SKYDISP_EF60_SS) || \
+    defined(CONFIG_F_SKYDISP_EF59_SS)
+	if (!ctrl->lcd_on_skip_during_bootup)
+		ctrl->lcd_on_skip_during_bootup = true;
+
+	pr_err("%s:-\n", __func__);
+#else
 	pr_debug("%s:-\n", __func__);
+#endif
 	return 0;
 }
 
@@ -469,7 +671,7 @@ static int mdss_dsi_parse_dcs_cmds(struct device_node *np,
 	else
 		pcmds->link_state = DSI_LP_MODE;
 
-	pr_debug("%s: dcs_cmd=%x len=%d, cmd_cnt=%d link_state=%d\n", __func__,
+	pr_err("%s: dcs_cmd=%x len=%d, cmd_cnt=%d link_state=%d\n", __func__,
 		pcmds->buf[0], pcmds->blen, pcmds->cmd_cnt, pcmds->link_state);
 
 	return 0;
@@ -910,6 +1112,11 @@ static int mdss_panel_parse_dt(struct device_node *np,
 
 	mdss_dsi_parse_dcs_cmds(np, &ctrl_pdata->off_cmds,
 		"qcom,mdss-dsi-off-command", "qcom,mdss-dsi-off-command-state");
+
+#ifdef CONFIG_F_SKYDISP_CABC_CONTROL
+	mdss_dsi_parse_dcs_cmds(np, &ctrl_pdata->cabc_cmds,
+		"qcom,mdss-dsi-cabc-command", "qcom,mdss-dsi-cabc-command-state");
+#endif
 
 	return 0;
 

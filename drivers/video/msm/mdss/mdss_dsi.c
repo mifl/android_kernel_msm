@@ -26,6 +26,9 @@
 #include "mdss_panel.h"
 #include "mdss_dsi.h"
 #include "mdss_debug.h"
+#ifdef CONFIG_F_SKYDISP_SILENT_BOOT	 //seunghwa_Ji p13832
+#include <mach/pantech_sys.h>
+#endif
 
 static unsigned char *mdss_dsi_base;
 
@@ -51,6 +54,58 @@ static int mdss_dsi_regulator_init(struct platform_device *pdev)
 
 static int mdss_dsi_panel_power_on(struct mdss_panel_data *pdata, int enable)
 {
+#if defined(CONFIG_F_SKYDISP_EF56_SS) || defined(CONFIG_F_SKYDISP_EF59_SS) || \
+    defined(CONFIG_F_SKYDISP_EF60_SS)
+	int ret;
+	struct mdss_dsi_ctrl_pdata *ctrl_pdata = NULL;
+
+	if (pdata == NULL) {
+		pr_err("%s: Invalid input data\n", __func__);
+		ret = -EINVAL;
+		goto error;
+	}
+
+	ctrl_pdata = container_of(pdata, struct mdss_dsi_ctrl_pdata,
+				panel_data);
+	pr_debug("%s: enable=%d\n", __func__, enable);
+
+	if (enable) {
+		ret = msm_dss_enable_vreg(
+			ctrl_pdata->power_data.vreg_config,
+			ctrl_pdata->power_data.num_vreg, 1);
+		if (ret) {
+			pr_err("%s:Failed to enable vregs.rc=%d\n",
+				__func__, ret);
+			goto error;
+		}
+
+		gpio_set_value((ctrl_pdata->lcd_vddio_switch_en_gpio), 1);
+		msleep(50);
+		gpio_set_value((ctrl_pdata->lcd_vddio_reg_en_gpio), 1);
+		msleep(10);
+
+#if (0) // 20140410, kkcho, Set-changed after cpl-patch.
+		if (pdata->panel_info.panel_power_on == 0)
+			mdss_dsi_panel_reset(pdata, 1);
+#endif
+	} else {
+		mdss_dsi_panel_reset(pdata, 0);
+
+		gpio_set_value((ctrl_pdata->lcd_vddio_reg_en_gpio), 0);//14
+		msleep(50);
+		gpio_set_value((ctrl_pdata->lcd_vddio_switch_en_gpio), 0);//69
+
+		ret = msm_dss_enable_vreg(
+			ctrl_pdata->power_data.vreg_config,
+			ctrl_pdata->power_data.num_vreg, 0);
+		if (ret) {
+			pr_err("%s: Failed to disable vregs.rc=%d\n",
+				__func__, ret);
+		}
+	}
+error:
+	return ret;
+#else /* QUALCOMM default */
 	int ret;
 	struct mdss_dsi_ctrl_pdata *ctrl_pdata = NULL;
 
@@ -91,6 +146,7 @@ static int mdss_dsi_panel_power_on(struct mdss_panel_data *pdata, int enable)
 	}
 error:
 	return ret;
+#endif /* QUALCOMM default */
 }
 
 static void mdss_dsi_put_dt_vreg_data(struct device *dev,
@@ -367,6 +423,12 @@ int mdss_dsi_on(struct mdss_panel_data *pdata)
 
 	pinfo = &pdata->panel_info;
 
+	ret = mdss_dsi_panel_power_on(pdata, 1);
+	if (ret) {
+		pr_err("%s: Panel power on failed\n", __func__);
+		return ret;
+	}
+
 	ret = msm_dss_enable_vreg(ctrl_pdata->power_data.vreg_config,
 				ctrl_pdata->power_data.num_vreg, 1);
 	if (ret) {
@@ -524,6 +586,9 @@ static int mdss_dsi_unblank(struct mdss_panel_data *pdata)
 				mdss_dsi_set_tear_on(ctrl_pdata);
 		}
 	}
+#ifdef CONFIG_F_SKYDISP_SILENT_BOOT	//seunghwa_Ji p13832
+	pantech_sys_reset_backlight_flag_set(true);
+#endif
 
 	pr_debug("%s-:\n", __func__);
 
@@ -564,6 +629,10 @@ static int mdss_dsi_blank(struct mdss_panel_data *pdata)
 		}
 		ctrl_pdata->ctrl_state &= ~CTRL_STATE_PANEL_INIT;
 	}
+#ifdef CONFIG_F_SKYDISP_SILENT_BOOT	//seunghwa_Ji p13832
+	pantech_sys_reset_backlight_flag_set (false);
+	pdata->silent_backlight = false;
+#endif
 	pr_debug("%s-:End\n", __func__);
 	return ret;
 }
@@ -748,8 +817,16 @@ static int mdss_dsi_event_handler(struct mdss_panel_data *pdata,
 		rc = mdss_dsi_on(pdata);
 		mdss_dsi_op_mode_config(pdata->panel_info.mipi.mode,
 							pdata);
+#ifdef CONFIG_F_SKYDISP_SILENT_BOOT
+		if (ctrl_pdata->on_cmds.link_state == DSI_LP_MODE) {
+			if (pdata->silent_backlight  == true)
+				break;
+			rc = mdss_dsi_unblank(pdata);
+		}
+#else
 		if (ctrl_pdata->on_cmds.link_state == DSI_LP_MODE)
 			rc = mdss_dsi_unblank(pdata);
+#endif
 		break;
 	case MDSS_EVENT_PANEL_ON:
 		ctrl_pdata->ctrl_state |= CTRL_STATE_MDP_ACTIVE;
@@ -1019,6 +1096,19 @@ static int __devinit mdss_dsi_ctrl_probe(struct platform_device *pdev)
 		goto error_pan_node;
 	}
 
+#ifdef CONFIG_F_SKYDISP_SILENT_BOOT
+	if (pantech_sys_rst_is_silent_boot_mode()) { // if value is 1, silent boot
+		if (!pantech_sys_reset_backlight_flag_get()) {// if value is 0, backlight off
+			ctrl_pdata->panel_data.silent_backlight = true;
+		} else {
+			ctrl_pdata->panel_data.silent_backlight = false;
+		}
+	} else {
+		ctrl_pdata->panel_data.silent_backlight = false;
+	}
+	printk(KERN_WARNING"[%s]value of sky_sys_rst_is_backlight_off = %d\n",__func__,ctrl_pdata->panel_data.silent_backlight);
+	pantech_sys_reset_backlight_flag_set (true);
+#endif
 	pr_debug("%s: Dsi Ctrl->%d initialized\n", __func__, index);
 	return 0;
 
@@ -1243,6 +1333,207 @@ int dsi_panel_device_register(struct device_node *pan_node,
 		pinfo->new_fps = pinfo->mipi.frame_rate;
 	}
 
+#if defined(CONFIG_F_SKYDISP_EF56_SS) || defined(CONFIG_F_SKYDISP_EF59_SS) || \
+    defined(CONFIG_F_SKYDISP_EF60_SS)
+	/* backlight gpio */
+	ctrl_pdata->bl_en_gpio = of_get_named_gpio(ctrl_pdev->dev.of_node,
+						     "qcom,platform-bl-en-gpio", 0);
+	if (!gpio_is_valid(ctrl_pdata->bl_en_gpio)) {
+		pr_err("%s:%d, Disp_en gpio not specified\n",
+						__func__, __LINE__);
+	} else {
+		rc = gpio_request(ctrl_pdata->bl_en_gpio, "bl_enable");
+		if (rc) {
+			pr_err("request bl enable gpio failed, rc=%d\n",
+			       rc);
+			gpio_free(ctrl_pdata->bl_en_gpio);
+			return -ENODEV;
+		}
+		rc = gpio_direction_output(ctrl_pdata->bl_en_gpio, 1);
+		if (rc) {
+			pr_err("set_direction for bl_en_gpio gpio failed, rc=%d\n",
+			       rc);
+			gpio_free(ctrl_pdata->bl_en_gpio);
+			return -ENODEV;
+		}
+	}
+	/* 1.8V regulator chip switch */
+	ctrl_pdata->lcd_vddio_switch_en_gpio = of_get_named_gpio(ctrl_pdev->dev.of_node,
+						 "qcom,platform-vddio-switch-gpio", 0);
+	if (!gpio_is_valid(ctrl_pdata->lcd_vddio_switch_en_gpio)) {
+		pr_err("%s:%d, 1.8v Ext Regulator switch gpio not specified\n",
+						__func__, __LINE__);
+	} else {
+		rc = gpio_request(ctrl_pdata->lcd_vddio_switch_en_gpio, "lcd_vddio_ext_reg_switch");
+		if (rc) {
+			pr_err("request 1.8v Ext Regulator switch gpio failed, rc=%d\n",
+				rc);
+			gpio_free(ctrl_pdata->lcd_vddio_switch_en_gpio);
+			if (gpio_is_valid(ctrl_pdata->bl_en_gpio))
+				gpio_free(ctrl_pdata->bl_en_gpio);
+			return -ENODEV;
+		}
+		rc = gpio_direction_output(ctrl_pdata->lcd_vddio_switch_en_gpio, 1);
+		if (rc) {
+			pr_err("set_direction for lcd_vddio_ext_reg_switch gpio failed, rc=%d\n",
+			       rc);
+			gpio_free(ctrl_pdata->lcd_vddio_switch_en_gpio);
+			if (gpio_is_valid(ctrl_pdata->bl_en_gpio))
+				gpio_free(ctrl_pdata->bl_en_gpio);
+			return -ENODEV;
+		}
+	}
+
+	/* 1.8V regulator */
+	ctrl_pdata->lcd_vddio_reg_en_gpio = of_get_named_gpio(ctrl_pdev->dev.of_node,
+						 "qcom,platform-vddio-reg-gpio", 0);
+	if (!gpio_is_valid(ctrl_pdata->lcd_vddio_reg_en_gpio)) {
+		pr_err("%s:%d, 1.8v Ext Regulator gpio not specified\n",
+						__func__, __LINE__);
+	} else {
+		rc = gpio_request(ctrl_pdata->lcd_vddio_reg_en_gpio, "lcd_vddio_ext_reg");
+		if (rc) {
+			pr_err("request 1.8v Ext Regulator gpio failed, rc=%d\n",
+				rc);
+			gpio_free(ctrl_pdata->lcd_vddio_reg_en_gpio);
+			if (gpio_is_valid(ctrl_pdata->bl_en_gpio))
+				gpio_free(ctrl_pdata->bl_en_gpio);
+			if (gpio_is_valid(ctrl_pdata->lcd_vddio_switch_en_gpio))
+				gpio_free(ctrl_pdata->lcd_vddio_switch_en_gpio);
+			return -ENODEV;
+		}
+		rc = gpio_direction_output(ctrl_pdata->lcd_vddio_reg_en_gpio, 1);
+		if (rc) {
+			pr_err("set_direction for lcd_vddio_ext_reg gpio failed, rc=%d\n",
+			       rc);
+			gpio_free(ctrl_pdata->lcd_vddio_reg_en_gpio);
+			if (gpio_is_valid(ctrl_pdata->bl_en_gpio))
+				gpio_free(ctrl_pdata->bl_en_gpio);
+			if (gpio_is_valid(ctrl_pdata->lcd_vddio_switch_en_gpio))
+				gpio_free(ctrl_pdata->lcd_vddio_switch_en_gpio);
+			return -ENODEV;
+		}
+	}
+
+	/* LCD reset */
+	ctrl_pdata->rst_gpio = of_get_named_gpio(ctrl_pdev->dev.of_node,
+						 "qcom,platform-reset-gpio", 0);
+	if (!gpio_is_valid(ctrl_pdata->rst_gpio)) {
+		pr_err("%s:%d, reset gpio not specified\n",
+						__func__, __LINE__);
+	} else {
+		rc = gpio_request(ctrl_pdata->rst_gpio, "disp_rst_n");
+		if (rc) {
+			pr_err("request reset gpio failed, rc=%d\n",
+				rc);
+			gpio_free(ctrl_pdata->rst_gpio);
+			if (gpio_is_valid(ctrl_pdata->bl_en_gpio))
+				gpio_free(ctrl_pdata->bl_en_gpio);
+			if (gpio_is_valid(ctrl_pdata->lcd_vddio_switch_en_gpio))
+				gpio_free(ctrl_pdata->lcd_vddio_switch_en_gpio);
+			if (gpio_is_valid(ctrl_pdata->lcd_vddio_reg_en_gpio))
+				gpio_free(ctrl_pdata->lcd_vddio_reg_en_gpio);
+			return -ENODEV;
+		}
+		rc = gpio_direction_output(ctrl_pdata->rst_gpio, 1);
+		if (rc) {
+			pr_err("set_direction for lcd rst gpio failed, rc=%d\n",
+			       rc);
+			gpio_free(ctrl_pdata->rst_gpio);
+			if (gpio_is_valid(ctrl_pdata->bl_en_gpio))
+				gpio_free(ctrl_pdata->bl_en_gpio);
+			if (gpio_is_valid(ctrl_pdata->lcd_vddio_switch_en_gpio))
+				gpio_free(ctrl_pdata->lcd_vddio_switch_en_gpio);
+			if (gpio_is_valid(ctrl_pdata->lcd_vddio_reg_en_gpio))
+				gpio_free(ctrl_pdata->lcd_vddio_reg_en_gpio);
+			return -ENODEV;
+		}
+	}
+
+	/* +5.6V regulator */
+	ctrl_pdata->lcd_vcip_reg_en_gpio = of_get_named_gpio(ctrl_pdev->dev.of_node,
+						 "qcom,platform-vcip-reg-gpio", 0);
+	if (!gpio_is_valid(ctrl_pdata->lcd_vcip_reg_en_gpio)) {
+		pr_err("%s:%d, +5.6v Ext Regulator gpio not specified\n",
+						__func__, __LINE__);
+	} else {
+		rc = gpio_request(ctrl_pdata->lcd_vcip_reg_en_gpio, "lcd_vcip_ext_reg");
+		if (rc) {
+			pr_err("request +5.6v Ext Regulator gpio failed, rc=%d\n",
+				rc);
+			gpio_free(ctrl_pdata->lcd_vcip_reg_en_gpio);
+			if (gpio_is_valid(ctrl_pdata->bl_en_gpio))
+				gpio_free(ctrl_pdata->bl_en_gpio);
+			if (gpio_is_valid(ctrl_pdata->lcd_vddio_switch_en_gpio))
+				gpio_free(ctrl_pdata->lcd_vddio_switch_en_gpio);
+			if (gpio_is_valid(ctrl_pdata->lcd_vddio_reg_en_gpio))
+				gpio_free(ctrl_pdata->lcd_vddio_reg_en_gpio);
+			if (gpio_is_valid(ctrl_pdata->rst_gpio))
+				gpio_free(ctrl_pdata->rst_gpio);
+			return -ENODEV;
+		}
+		rc = gpio_direction_output(ctrl_pdata->lcd_vcip_reg_en_gpio, 1);
+		if (rc) {
+			pr_err("set_direction for lcd_vci_ext_reg gpio failed, rc=%d\n",
+			       rc);
+			gpio_free(ctrl_pdata->lcd_vcip_reg_en_gpio);
+			if (gpio_is_valid(ctrl_pdata->bl_en_gpio))
+				gpio_free(ctrl_pdata->bl_en_gpio);
+			if (gpio_is_valid(ctrl_pdata->lcd_vddio_switch_en_gpio))
+				gpio_free(ctrl_pdata->lcd_vddio_switch_en_gpio);
+			if (gpio_is_valid(ctrl_pdata->lcd_vddio_reg_en_gpio))
+				gpio_free(ctrl_pdata->lcd_vddio_reg_en_gpio);
+			if (gpio_is_valid(ctrl_pdata->rst_gpio))
+				gpio_free(ctrl_pdata->rst_gpio);
+			return -ENODEV;
+		}
+	}
+#if defined(CONFIG_F_SKYDISP_EF56_SS)
+	/* -5.4V regulator */
+	ctrl_pdata->lcd_vcin_reg_en_gpio = of_get_named_gpio(ctrl_pdev->dev.of_node,
+						 "qcom,platform-vcin-reg-gpio", 0);
+	if (!gpio_is_valid(ctrl_pdata->lcd_vcin_reg_en_gpio)) {
+		pr_err("%s:%d, -5.4v Ext Regulator gpio not specified\n",
+						__func__, __LINE__);
+	} else {
+		rc = gpio_request(ctrl_pdata->lcd_vcin_reg_en_gpio, "lcd_vcin_ext_reg");
+		if (rc) {
+			pr_err("request -5.4v Ext Regulator gpio failed, rc=%d\n",
+				rc);
+			gpio_free(ctrl_pdata->lcd_vcin_reg_en_gpio);
+			if (gpio_is_valid(ctrl_pdata->bl_en_gpio))
+				gpio_free(ctrl_pdata->bl_en_gpio);
+			if (gpio_is_valid(ctrl_pdata->lcd_vddio_switch_en_gpio))
+				gpio_free(ctrl_pdata->lcd_vddio_switch_en_gpio);
+			if (gpio_is_valid(ctrl_pdata->lcd_vddio_reg_en_gpio))
+				gpio_free(ctrl_pdata->lcd_vddio_reg_en_gpio);
+			if (gpio_is_valid(ctrl_pdata->lcd_vcip_reg_en_gpio))
+				gpio_free(ctrl_pdata->lcd_vcip_reg_en_gpio);
+			if (gpio_is_valid(ctrl_pdata->rst_gpio))
+				gpio_free(ctrl_pdata->rst_gpio);
+
+			return -ENODEV;
+		}
+		rc = gpio_direction_output(ctrl_pdata->lcd_vcin_reg_en_gpio, 1);
+		if (rc) {
+			pr_err("set_direction for lcd_vci_ext_reg gpio failed, rc=%d\n",
+			       rc);
+			gpio_free(ctrl_pdata->lcd_vcin_reg_en_gpio);
+			if (gpio_is_valid(ctrl_pdata->bl_en_gpio))
+				gpio_free(ctrl_pdata->bl_en_gpio);
+			if (gpio_is_valid(ctrl_pdata->lcd_vddio_switch_en_gpio))
+				gpio_free(ctrl_pdata->lcd_vddio_switch_en_gpio);
+			if (gpio_is_valid(ctrl_pdata->lcd_vddio_reg_en_gpio))
+				gpio_free(ctrl_pdata->lcd_vddio_reg_en_gpio);
+			if (gpio_is_valid(ctrl_pdata->lcd_vcip_reg_en_gpio))
+				gpio_free(ctrl_pdata->lcd_vcip_reg_en_gpio);
+			if (gpio_is_valid(ctrl_pdata->rst_gpio))
+				gpio_free(ctrl_pdata->rst_gpio);
+			return -ENODEV;
+		}
+	}
+#endif /* defined(CONFIG_F_SKYDISP_EF56_SS) */
+#else /* QUALCOMM default */
 	ctrl_pdata->disp_en_gpio = of_get_named_gpio(ctrl_pdev->dev.of_node,
 		"qcom,platform-enable-gpio", 0);
 
@@ -1343,6 +1634,7 @@ int dsi_panel_device_register(struct device_node *pan_node,
 			}
 		}
 	}
+#endif /* QUALCOMM default */
 
 	if (mdss_dsi_clk_init(ctrl_pdev, ctrl_pdata)) {
 		pr_err("%s: unable to initialize Dsi ctrl clks\n", __func__);

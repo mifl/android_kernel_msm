@@ -256,6 +256,11 @@ struct mdss_dsi_ctrl_pdata {
 	int disp_en_gpio;
 	int disp_te_gpio;
 	int mode_gpio;
+	int bl_en_gpio;
+	int lcd_vcip_reg_en_gpio;
+	int lcd_vcin_reg_en_gpio;
+	int lcd_vddio_reg_en_gpio;
+	int lcd_vddio_switch_en_gpio;
 	int rst_gpio_requested;
 	int disp_en_gpio_requested;
 	int disp_te_gpio_requested;
@@ -278,6 +283,17 @@ struct mdss_dsi_ctrl_pdata {
 
 	struct dsi_panel_cmds on_cmds;
 	struct dsi_panel_cmds off_cmds;
+#ifdef CONFIG_F_SKYDISP_CABC_CONTROL
+	struct dsi_panel_cmds cabc_cmds;
+#endif
+#ifdef CONFIG_F_SKYDISP_CMDS_CONTROL
+	int lcd_cmds_check;
+	struct dsi_panel_cmds on_cmds_user;
+#endif
+#if defined(CONFIG_MACH_MSM8974_EF56S) || defined(CONFIG_F_SKYDISP_EF60_SS) || \
+    defined(CONFIG_F_SKYDISP_EF59_SS)
+	int lcd_on_skip_during_bootup;
+#endif
 
 	struct dcs_cmd_list cmdlist;
 	struct completion dma_comp;
@@ -355,4 +371,5 @@ int mdss_dsi_bta_status_check(struct mdss_dsi_ctrl_pdata *ctrl);
 int mdss_dsi_panel_init(struct device_node *node,
 		struct mdss_dsi_ctrl_pdata *ctrl_pdata,
 		bool cmd_cfg_cont_splash);
+void mdss_set_tx_power_mode(int mode, struct mdss_panel_data *pdata);
 #endif /* MDSS_DSI_H */

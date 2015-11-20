@@ -337,6 +337,10 @@ struct mdss_panel_data {
 	int (*event_handler) (struct mdss_panel_data *pdata, int e, void *arg);
 
 	struct mdss_panel_data *next;
+#ifdef CONFIG_F_SKYDISP_SILENT_BOOT	//seunghwa_Ji p13832
+	int silent_flag;
+	int silent_backlight;
+#endif
 };
 
 /**
