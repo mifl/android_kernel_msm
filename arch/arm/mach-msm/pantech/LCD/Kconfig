@@ -19,7 +19,6 @@ config MACH_MSM8974_LCD_COMMON
 	select F_SKYDISP_CMDS_CONTROL
 	select F_SKYDISP_BACKLIGHT_CMDS_CTL
 	select F_SKYDISP_FACTORY_SLEEP_ENABLE
-	select F_SKYDISP_ADJUST_MDP_BANDWIDTH
 	select F_QUALCOMM_BUGFIX_SURFACEFLINGER_PENDING
 	select F_QUALCOMM_BUGFIX_MDP_UNDERRUN
 	select F_QUALCOMM_MDP_RGB_LAYER_UNDERRUN
@@ -213,16 +212,6 @@ config F_SKYDISP_BACKLIGHT_CMDS_CTL
 #							     #
 ##############################################################
 ##############################################################
-
-##############################################################
-# owner  : p12226
-# date    : 2013.08.28
-# PLM    :
-# Case  :  none
-# Description : mdp ab value adjusting
-##############################################################
-config F_SKYDISP_ADJUST_MDP_BANDWIDTH
-	bool
 
 ##############################################################
 # owner  : p10443

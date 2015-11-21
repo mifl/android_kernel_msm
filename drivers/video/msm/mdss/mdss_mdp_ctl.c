@@ -27,11 +27,7 @@
 /* 1.5 bus fudge factor */
 #define MDSS_MDP_BUS_FUDGE_FACTOR_IB(val) (((val) / 2) * 3)
 #define MDSS_MDP_BUS_FUDGE_FACTOR_HIGH_IB(val) (val << 1)
-#ifdef CONFIG_F_SKYDISP_ADJUST_MDP_BANDWIDTH
-#define MDSS_MDP_BUS_FUDGE_FACTOR_AB(val) (div_u64(val,10) * 40);  //it is okay about 3.10 but 4.0 is safe for underrun*/
-#else
 #define MDSS_MDP_BUS_FUDGE_FACTOR_AB(val) (val << 1)
-#endif
 #if defined(CONFIG_F_SKYDISP_LCD_MSM8974_V2_COMMON)
 /* 20140325, kkcho, Bug-fix : 8974_KK underrun-issue, 1.6G ==> 3.2G */
 #define MDSS_MDP_BUS_FLOOR_BW (3200000000ULL >> MDSS_MDP_BUS_FACTOR_SHIFT)
