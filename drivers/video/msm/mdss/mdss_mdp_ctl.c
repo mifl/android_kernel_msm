@@ -32,8 +32,7 @@
 #else
 #define MDSS_MDP_BUS_FUDGE_FACTOR_AB(val) (val << 1)
 #endif
-#if defined(CONFIG_F_SKYDISP_EF56_SS) || defined(CONFIG_F_SKYDISP_EF59_SS) || \
-    defined(CONFIG_F_SKYDISP_EF60_SS)
+#if defined(CONFIG_F_SKYDISP_LCD_MSM8974_V2_COMMON)
 /* 20140325, kkcho, Bug-fix : 8974_KK underrun-issue, 1.6G ==> 3.2G */
 #define MDSS_MDP_BUS_FLOOR_BW (3200000000ULL >> MDSS_MDP_BUS_FACTOR_SHIFT)
 #else
