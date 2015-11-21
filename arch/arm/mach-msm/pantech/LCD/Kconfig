@@ -21,7 +21,6 @@ config MACH_MSM8974_LCD_COMMON
 	select F_SKYDISP_FACTORY_SLEEP_ENABLE
 	select F_QUALCOMM_BUGFIX_SURFACEFLINGER_PENDING
 	select F_QUALCOMM_BUGFIX_MDP_UNDERRUN
-	select F_QUALCOMM_MDP_RGB_LAYER_UNDERRUN
 	select F_QUALCOMM_MOVIE_PLAYER_MDP_ROTATOR_UNDERRUN
 	select F_QUALCOMM_WORKAROUND_FOR_GDSC_OXILI_FAIL
 
@@ -243,16 +242,6 @@ config F_QUALCOMM_WORKAROUND_FOR_GDSC_OXILI_FAIL
 # Description : Bluscreen shown in voice recoder with rotation
 ##############################################################
 config F_QUALCOMM_BUGFIX_MDP_UNDERRUN
-	bool
-
-##############################################################
-# owner  : p14974
-# date    : 2014.03.11
-# PLM    : EF60S_KK 899
-# Case  : 01465155
-# Description : Fix MDP underrun over Full RGB 4 Layers
-##############################################################
-config F_QUALCOMM_MDP_RGB_LAYER_UNDERRUN
 	bool
 
 ##############################################################
