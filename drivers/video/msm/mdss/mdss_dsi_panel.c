@@ -28,7 +28,9 @@
 #include "mdss_dsi.h"
 #include "mdss_mdp.h"
 
+#ifdef CONFIG_F_SKYDISP_LCD_MSM8974_V2_COMMON
 extern struct msm_fb_data_type * mfdmsm_fb_get_mfd(void);
+#endif
 
 #define DT_CMD_HDR 6
 
@@ -399,17 +401,21 @@ static void mdss_dsi_panel_bl_ctrl(struct mdss_panel_data *pdata,
 							u32 bl_level)
 {
 	struct mdss_dsi_ctrl_pdata *ctrl_pdata = NULL;
+#if defined(CONFIG_F_SKYDISP_LCD_MSM8974_V2_COMMON)
 	struct msm_fb_data_type * mfd = mfdmsm_fb_get_mfd();
+#endif
 
 	if (pdata == NULL) {
 		pr_err("%s: Invalid input data\n", __func__);
 		return;
 	}
 
+#if defined(CONFIG_F_SKYDISP_LCD_MSM8974_V2_COMMON)
 	if (!mfd->panel_power_on) {
 		printk("[%s] panel is off state (%d).....\n",__func__,mfd->panel_power_on);
 		return;
 	}
+#endif
 
 	ctrl_pdata = container_of(pdata, struct mdss_dsi_ctrl_pdata,
 				panel_data);

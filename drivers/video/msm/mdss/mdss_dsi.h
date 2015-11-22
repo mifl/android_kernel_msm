@@ -256,11 +256,13 @@ struct mdss_dsi_ctrl_pdata {
 	int disp_en_gpio;
 	int disp_te_gpio;
 	int mode_gpio;
+#ifdef CONFIG_F_SKYDISP_LCD_MSM8974_V2_COMMON
 	int bl_en_gpio;
 	int lcd_vcip_reg_en_gpio;
 	int lcd_vcin_reg_en_gpio;
 	int lcd_vddio_reg_en_gpio;
 	int lcd_vddio_switch_en_gpio;
+#endif
 	int rst_gpio_requested;
 	int disp_en_gpio_requested;
 	int disp_te_gpio_requested;
@@ -370,5 +372,7 @@ int mdss_dsi_bta_status_check(struct mdss_dsi_ctrl_pdata *ctrl);
 int mdss_dsi_panel_init(struct device_node *node,
 		struct mdss_dsi_ctrl_pdata *ctrl_pdata,
 		bool cmd_cfg_cont_splash);
+#ifdef CONFIG_F_SKYDISP_LCD_MSM8974_V2_COMMON
 void mdss_set_tx_power_mode(int mode, struct mdss_panel_data *pdata);
+#endif
 #endif /* MDSS_DSI_H */
