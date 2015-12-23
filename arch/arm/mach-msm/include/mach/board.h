@@ -189,8 +189,12 @@ struct msm_gpio_set_tbl {
 };
 
 struct msm_camera_gpio_num_info {
+#ifdef CONFIG_MSMB_CAMERA_LEGACY
+	uint16_t gpio_num[7];
+#else
 	uint16_t gpio_num[10];
 	uint8_t valid[10];
+#endif
 };
 
 struct msm_camera_gpio_conf {

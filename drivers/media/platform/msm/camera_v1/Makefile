@@ -1,11 +1,11 @@
-ccflags-y += -Idrivers/media/platform/msm/camera_v2
-ccflags-y += -Idrivers/media/platform/msm/camera_v2/sensor
-ccflags-y += -Idrivers/media/platform/msm/camera_v2/codecs
-ccflags-y += -Idrivers/media/platform/msm/camera_v2/isps
-ccflags-y += -Idrivers/media/platform/msm/camera_v2/pproc
-ccflags-y += -Idrivers/media/platform/msm/camera_v2/msm_vb2
-ccflags-y += -Idrivers/media/platform/msm/camera_v2/camera
-ccflags-y += -Idrivers/media/platform/msm/camera_v2/jpeg_10
+ccflags-y += -Idrivers/media/platform/msm/camera_v1
+ccflags-y += -Idrivers/media/platform/msm/camera_v1/sensor
+ccflags-y += -Idrivers/media/platform/msm/camera_v1/codecs
+ccflags-y += -Idrivers/media/platform/msm/camera_v1/isps
+ccflags-y += -Idrivers/media/platform/msm/camera_v1/pproc
+ccflags-y += -Idrivers/media/platform/msm/camera_v1/msm_vb2
+ccflags-y += -Idrivers/media/platform/msm/camera_v1/camera
+ccflags-y += -Idrivers/media/platform/msm/camera_v1/jpeg_10
 
 obj-$(CONFIG_MSMB_CAMERA) += msm.o
 obj-$(CONFIG_MSMB_CAMERA) += camera/
