@@ -28,6 +28,15 @@ menuconfig MSMB_CAMERA
 	  adds support for the camera driver stack including sensor, isp
 	  and postprocessing drivers.
 
+config MSMB_CAMERA_LEGACY
+	bool "Qualcomm MSM camera 2.0 Legacy"
+	depends on MSMB_CAMERA
+	default n
+	---help---
+	  Say Y here to enable selecting the video adapters for
+	  Qualcomm msm camera and video capture 2.0, for drivers
+	  based in CAF LNX.LA.3.5.1
+
 config MSMB_CAMERA_DEBUG
 	bool "Qualcomm MSM camera 2.0 debugging with printk"
 	depends on MSMB_CAMERA
@@ -35,7 +44,12 @@ config MSMB_CAMERA_DEBUG
 	  Enable printk() debug for msm camera 2.0
 
 if MSMB_CAMERA
+if MSMB_CAMERA_LEGACY
+source "drivers/media/platform/msm/camera_v1/Kconfig"
+endif
+if !MSMB_CAMERA_LEGACY
 source "drivers/media/platform/msm/camera_v2/Kconfig"
+endif
 endif # MSMB_CAMERA
 
 source "drivers/media/platform/msm/vidc/Kconfig"
