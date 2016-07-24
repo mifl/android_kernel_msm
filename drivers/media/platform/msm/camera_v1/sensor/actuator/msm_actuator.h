@@ -14,9 +14,9 @@
 
 #include <linux/i2c.h>
 #include <linux/gpio.h>
-#include <mach/camera2.h>
+#include <mach/camera1.h>
 #include <media/v4l2-subdev.h>
-#include <media/msmb_camera.h>
+#include <media/msmb_camera_v1.h>
 #include "msm_camera_i2c.h"
 
 #define DEFINE_MSM_MUTEX(mutexname) \

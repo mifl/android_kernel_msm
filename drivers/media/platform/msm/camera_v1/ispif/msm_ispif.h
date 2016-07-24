@@ -16,7 +16,7 @@
 #include <linux/clk.h>
 #include <linux/io.h>
 #include <media/v4l2-subdev.h>
-#include <media/msmb_ispif.h>
+#include <media/msmb_ispif_v1.h>
 #include "msm_sd.h"
 
 struct ispif_irq_status {
