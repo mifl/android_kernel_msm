@@ -55,7 +55,6 @@ static int mdss_dsi_regulator_init(struct platform_device *pdev)
 
 static int mdss_dsi_panel_power_on(struct mdss_panel_data *pdata, int enable)
 {
-#if defined(CONFIG_F_SKYDISP_EF63_SS)
 	int ret;
 	struct mdss_dsi_ctrl_pdata *ctrl_pdata = NULL;
 
@@ -79,19 +78,25 @@ static int mdss_dsi_panel_power_on(struct mdss_panel_data *pdata, int enable)
 			goto error;
 		}
 
+#if defined(CONFIG_F_SKYDISP_EF63_SS)
 		gpio_set_value((ctrl_pdata->octa_vddi_reg_en_gpio), 1);
 		msleep(10);
 		gpio_set_value((ctrl_pdata->octa_vci_reg_en_gpio), 1);
 		msleep(10);
+#endif
 
 		if (pdata->panel_info.panel_power_on == 0)
 			mdss_dsi_panel_reset(pdata, 1);
+
 	} else {
+
 		mdss_dsi_panel_reset(pdata, 0);
 
+#if defined(CONFIG_F_SKYDISP_EF63_SS)
 		gpio_set_value((ctrl_pdata->octa_vci_reg_en_gpio), 0);
 		msleep(10);
 		gpio_set_value((ctrl_pdata->octa_vddi_reg_en_gpio), 0);
+#endif
 
 		ret = msm_dss_enable_vreg(
 			ctrl_pdata->power_data.vreg_config,
@@ -103,48 +108,6 @@ static int mdss_dsi_panel_power_on(struct mdss_panel_data *pdata, int enable)
 	}
 error:
 	return ret;
-#else /* QUALCOMM default */
-	int ret;
-	struct mdss_dsi_ctrl_pdata *ctrl_pdata = NULL;
-
-	if (pdata == NULL) {
-		pr_err("%s: Invalid input data\n", __func__);
-		ret = -EINVAL;
-		goto error;
-	}
-
-	ctrl_pdata = container_of(pdata, struct mdss_dsi_ctrl_pdata,
-				panel_data);
-	pr_debug("%s: enable=%d\n", __func__, enable);
-
-	if (enable) {
-		ret = msm_dss_enable_vreg(
-			ctrl_pdata->power_data.vreg_config,
-			ctrl_pdata->power_data.num_vreg, 1);
-		if (ret) {
-			pr_err("%s:Failed to enable vregs.rc=%d\n",
-				__func__, ret);
-			goto error;
-		}
-
-		if (pdata->panel_info.panel_power_on == 0)
-			mdss_dsi_panel_reset(pdata, 1);
-
-	} else {
-
-		mdss_dsi_panel_reset(pdata, 0);
-
-		ret = msm_dss_enable_vreg(
-			ctrl_pdata->power_data.vreg_config,
-			ctrl_pdata->power_data.num_vreg, 0);
-		if (ret) {
-			pr_err("%s: Failed to disable vregs.rc=%d\n",
-				__func__, ret);
-		}
-	}
-error:
-	return ret;
-#endif /* QUALCOMM default */
 }
 
 static void mdss_dsi_put_dt_vreg_data(struct device *dev,
