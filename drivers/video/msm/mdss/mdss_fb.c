@@ -176,7 +176,9 @@ static int mdss_fb_splash_thread(void *data)
 	}
 
 	mfd->bl_updated = true;
-	//mdss_fb_set_backlight(mfd, mfd->panel_info->bl_max >> 1);
+#if !defined(CONFIG_F_SKYDISP_EF63_SS)
+	mdss_fb_set_backlight(mfd, mfd->panel_info->bl_max >> 1);
+#endif
 
 	ret = mfd->mdp.splash_fnc(mfd, ov_index, MDP_CREATE_SPLASH_OV);
 	if (ret) {
@@ -1227,7 +1229,9 @@ static int mdss_fb_blank_sub(int blank_mode, struct fb_info *info,
 	if (mfd->dcm_state == DCM_ENTER)
 		return -EPERM;
 
+#if defined(CONFIG_F_SKYDISP_EF63_SS)
 	printk("%s : blank_mode =%d\n",__func__, blank_mode);
+#endif
 
 	switch (blank_mode) {
 	case FB_BLANK_UNBLANK:
@@ -2793,7 +2797,7 @@ struct fb_info *msm_fb_get_writeback_fb(void)
 
 	return NULL;
 }
-
+#if defined(CONFIG_F_SKYDISP_EF63_SS)
 struct msm_fb_data_type * mfdmsm_fb_get_mfd(void)
 {
 	int c = 0;
@@ -2805,6 +2809,7 @@ struct msm_fb_data_type * mfdmsm_fb_get_mfd(void)
 	}
 	return NULL;
 }
+#endif
 EXPORT_SYMBOL(msm_fb_get_writeback_fb);
 
 static int mdss_fb_register_extra_panel(struct platform_device *pdev,

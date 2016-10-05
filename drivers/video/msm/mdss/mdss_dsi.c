@@ -421,11 +421,13 @@ int mdss_dsi_on(struct mdss_panel_data *pdata)
 
 	pinfo = &pdata->panel_info;
 
+#if defined(CONFIG_F_SKYDISP_EF63_SS)
 	ret = mdss_dsi_panel_power_on(pdata, 1);
 	if (ret) {
 		pr_err("%s: Panel power on failed\n", __func__);
 		return ret;
 	}
+#endif
 
 	ret = msm_dss_enable_vreg(ctrl_pdata->power_data.vreg_config,
 				ctrl_pdata->power_data.num_vreg, 1);
@@ -819,17 +821,20 @@ static int mdss_dsi_event_handler(struct mdss_panel_data *pdata,
 		rc = mdss_dsi_on(pdata);
 		mdss_dsi_op_mode_config(pdata->panel_info.mipi.mode,
 							pdata);
+#ifdef CONFIG_F_SKYDISP_SILENT_BOOT
 #ifdef CONFIG_F_SKYDISP_MAGNAIC_OPERATING_BEFORE_TP20
 		if (ctrl_pdata->on_cmds.link_state == DSI_LP_MODE || ctrl_pdata->magnaic_on_cmds.link_state == DSI_LP_MODE) {
 #else
 		if (ctrl_pdata->on_cmds.link_state == DSI_LP_MODE) {
 #endif
-#ifdef CONFIG_F_SKYDISP_SILENT_BOOT
 			if (pdata->silent_backlight  == true)
 				break;
-#endif
 			rc = mdss_dsi_unblank(pdata);
 		}
+#else
+		if (ctrl_pdata->on_cmds.link_state == DSI_LP_MODE)
+			rc = mdss_dsi_unblank(pdata);
+#endif
 		break;
 	case MDSS_EVENT_PANEL_ON:
 		ctrl_pdata->ctrl_state |= CTRL_STATE_MDP_ACTIVE;

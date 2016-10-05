@@ -1084,17 +1084,21 @@ static void mdss_dsi_panel_bl_ctrl(struct mdss_panel_data *pdata,
 							u32 bl_level)
 {
 	struct mdss_dsi_ctrl_pdata *ctrl_pdata = NULL;
+#if defined(CONFIG_F_SKYDISP_EF63_SS)
 	struct msm_fb_data_type * mfd = mfdmsm_fb_get_mfd();
+#endif
 
 	if (pdata == NULL) {
 		pr_err("%s: Invalid input data\n", __func__);
 		return;
 	}
 
+#if defined(CONFIG_F_SKYDISP_EF63_SS)
 	if (!mfd->panel_power_on) {
 		printk("[%s] panel is off state (%d).....\n",__func__,mfd->panel_power_on);
 		return;
 	}
+#endif
 
 	ctrl_pdata = container_of(pdata, struct mdss_dsi_ctrl_pdata,
 				panel_data);
@@ -1161,23 +1165,23 @@ static int mdss_dsi_panel_on(struct mdss_panel_data *pdata)
 
 #ifdef CONFIG_F_SKYDISP_CMDS_CONTROL
 	if (ctrl->lcd_cmds_check == false) {
-#endif
-
 		if (ctrl->on_cmds.cmd_cnt) {
 #ifdef F_SKYDISP_MAGNAIC_OPERATING_BEFORE_TP20
 			if (ctrl->manufacture_id == MAGNA_DRIVER_IC)
 				mdss_dsi_panel_cmds_send(ctrl, &ctrl->magnaic_on_cmds);
 			else
 #endif
-			mdss_dsi_panel_cmds_send(ctrl, &ctrl->on_cmds);
+				mdss_dsi_panel_cmds_send(ctrl, &ctrl->on_cmds);
 		}
-#ifdef CONFIG_F_SKYDISP_CMDS_CONTROL
 	} else if (ctrl->lcd_cmds_check == true) {
 		if (ctrl->on_cmds_user.cmd_cnt)
 			mdss_dsi_panel_cmds_send(ctrl, &ctrl->on_cmds_user);
 		pr_info("user LCD on cmds---------------->\n");
 	}
-#endif
+#else /* QCOM Original */
+	if (ctrl->on_cmds.cmd_cnt)
+		mdss_dsi_panel_cmds_send(ctrl, &ctrl->on_cmds);
+#endif /* QCOM Original */
 
 #ifdef F_LSI_VDDM_OFFSET_RD_WR
 	if (ctrl->manufacture_id == SAMSUNG_DRIVER_IC) {
