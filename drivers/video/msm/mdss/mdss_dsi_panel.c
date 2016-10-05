@@ -1075,7 +1075,7 @@ void mtp_read_work(struct work_struct *work)
 				panel_data);
 
 	mdss_dsi_sw_reset(pdata);
-	mdss_dsi_host_init(&panel_info->mipi, pdata);
+	mdss_dsi_host_init(pdata);
 	mdss_dsi_op_mode_config(panel_info->mipi.mode, pdata);
 
 	mdss_mdp_clk_ctrl(MDP_BLOCK_POWER_ON, false);
