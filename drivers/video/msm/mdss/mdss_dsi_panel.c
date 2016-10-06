@@ -465,7 +465,8 @@ int mdss_dsi_panel_reset(struct mdss_panel_data *pdata, int enable)
 			return rc;
 		}
 #if defined(CONFIG_F_SKYDISP_EF63_SS)
-		if (!pinfo->panel_power_on) {
+		/* when lp11.init = 1 reset unset. */
+		if (!pinfo->panel_power_on || pinfo->mipi.lp11_init) {
 			gpio_set_value((ctrl_pdata->octa_rst_gpio), 1);
 		}
 #else /* QCOM Original */
