@@ -35,8 +35,6 @@
 # include <linux/efi.h>
 #endif
 
-static atomic_t *mem_lock;
-
 static inline unsigned long size_inside_page(unsigned long start,
 					     unsigned long size)
 {
@@ -92,40 +90,6 @@ void __weak unxlate_dev_mem_ptr(unsigned long phys, void *addr)
 {
 }
 
-static int get_lock()
-{
-	if(atomic_cmpxchg(mem_lock, 1, 0))
-		return 0;
-
-	printk("Could not acquire lock\n");
-	return -1;
-}
-
-static void release_lock()
-{
-	atomic_set(mem_lock, 1);
-	return 0;
-}
-
-#define LOCK_MEM	1
-#define UNLOCK_MEM	2
-static long ioctl_mem(struct file *filp, unsigned int command, unsigned long arg)
-{
-	int retval = 0;
-
-	switch(command) {
-	case LOCK_MEM:
-		retval = get_lock();
-		break;
-	case UNLOCK_MEM:
-		release_lock();
-		break;
-	default:
-		printk("Unknown ioctl\n");
-	}
-
-	return retval;
-}
 /*
  * This funcion reads the *physical* memory. The f_pos points directly to the
  * memory location.
@@ -797,7 +761,6 @@ static const struct file_operations mem_fops = {
 	.mmap		= mmap_mem,
 	.open		= open_mem,
 	.get_unmapped_area = get_unmapped_area_mem,
-	.unlocked_ioctl	= ioctl_mem,
 };
 #endif
 
@@ -987,9 +950,6 @@ static int __init chr_dev_init(void)
 		device_create(mem_class, NULL, MKDEV(MEM_MAJOR, minor),
 			      NULL, devlist[minor].name);
 	}
-
-	mem_lock = (atomic_t*) ioremap(0xfbfc000,4);
-	iowrite32(1, mem_lock);
 
 	return tty_init();
 }
