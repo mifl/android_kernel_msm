@@ -19,4 +19,3 @@ header-y += msmb_pproc.h
 header-y += ov7251_common.h
 header-y += ov7251L_common.h
 header-y += ov7251R_common.h
-header-y += imx214_common.h
